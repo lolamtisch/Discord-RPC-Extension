@@ -44,6 +44,8 @@ function checkActiveTab(tabId){
         }
       });
     }
+  }else{
+    disconnect();
   }
 }
 
