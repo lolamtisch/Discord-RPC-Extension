@@ -10,7 +10,15 @@ wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(data) {
     data = JSON.parse(data);
     console.log('Recived', data);
-    discord.send(data.clientId, data.presence);
+    if(typeof data.action !== 'undefined'){
+      switch (data.action) {
+        case 'disconnect':
+          discord.disconnect();
+          break;
+      }
+    }else{
+      discord.send(data.clientId, data.presence);
+    }
   });
   ws.send('Connected!');
 });

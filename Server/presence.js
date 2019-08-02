@@ -15,6 +15,12 @@ function resetTimeout(){
   }, 30000);
 }
 
+function disconnect(){
+  clearTimeout(timeout);
+  client.disconnect();
+  currentId = 0;
+}
+
 module.exports = {
   send: function(clientId, presence){
     if(currentId !== clientId || !currentId){
@@ -29,5 +35,6 @@ module.exports = {
   },
   keepAlive: function(){
     resetTimeout();
-  }
+  },
+  disconnect: disconnect,
 }

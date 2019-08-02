@@ -41,7 +41,8 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
       }
     });
   }else{
-    console.log('Browser not focused')
+    console.log('Browser not focused');
+    websocket.send(JSON.stringify({action: 'disconnect'}));
   }
 });
 
