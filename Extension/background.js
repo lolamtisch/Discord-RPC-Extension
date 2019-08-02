@@ -19,17 +19,38 @@ function onOpen(){
   console.log('Send');
 }
 
-function tabFocusChanged(tab){
-  console.log(tab.title);
-  websocket.send(JSON.stringify({
-    clientId: '606504719212478504',
-    presence: {
-      state: tab.title,
-      details: '🍱',
-      startTimestamp: Date.now(),
-      instance: true,
+var activeTab = {};
+var activeInterval;
+
+function checkActiveTab(tabId){
+  clearInterval(activeInterval);
+  if(typeof activeTab[tabId] !== 'undefined'){
+    console.log('Script Found', activeTab[tabId]);
+    requestPresence();
+    activeInterval = setInterval(function(){
+      requestPresence();
+    }, 15000);
+    function requestPresence(){
+      chrome.runtime.sendMessage(activeTab[tabId].extId, activeTab[tabId].tabId, function(response) {
+        console.log('response', response);
+        if(response){
+          websocket.send(JSON.stringify(response));
+        }else{
+          // Unregister Presence
+          console.log('Unregister Presence', tabId);
+          delete activeTab[tabId];
+          clearInterval(activeInterval);
+          disconnect();
+        }
+      });
     }
-  }));
+  }else{
+    disconnect();
+  }
+}
+
+function disconnect(){
+  websocket.send(JSON.stringify({action: 'disconnect'}));
 }
 
 chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
@@ -37,18 +58,28 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
   if(activeWindowId >= 0){
     chrome.tabs.query({ active: true, windowId: activeWindowId }, function (tabs) {
       if(tabs.length){
-        tabFocusChanged(tabs[0]);
+        checkActiveTab(tabs[0].id);
       }
     });
   }else{
     console.log('Browser not focused');
-    websocket.send(JSON.stringify({action: 'disconnect'}));
+    disconnect();
   }
 });
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
   console.log('Tab Changed', activeInfo.tabId);
-  chrome.tabs.get(activeInfo.tabId, function(tab){
-    tabFocusChanged(tab);
-  });
+  checkActiveTab(activeInfo.tabId);
+});
+
+chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
+  console.log('Register', request, sender);
+  activeTab[sender.tab.id] = {
+    extId: sender.id,
+    tabId: sender.tab.id
+  };
+  sendResponse({status: true});
+  if(sender.tab.active){
+    checkActiveTab(sender.tab.id);
+  }
 });

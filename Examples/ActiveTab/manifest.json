@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Active Tab Example",
+  "version": "0.0.1",
+  "description": "",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [{
+    "js": ["main.js"],
+    "matches": ["<all_urls>"]
+  }]
+}
