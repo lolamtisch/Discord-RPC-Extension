@@ -19,18 +19,35 @@ function onOpen(){
   console.log('Send');
 }
 
-chrome.tabs.onActivated.addListener(function(activeInfo) {
-  console.log(activeInfo);
-  chrome.tabs.get(activeInfo.tabId, function(tab){
-    console.log(tab.title);
-    websocket.send(JSON.stringify({
-      clientId: '606504719212478504',
-      presence: {
-        state: tab.title,
-        details: '🍱',
-        startTimestamp: Date.now(),
-        instance: true,
+function tabFocusChanged(tab){
+  console.log(tab.title);
+  websocket.send(JSON.stringify({
+    clientId: '606504719212478504',
+    presence: {
+      state: tab.title,
+      details: '🍱',
+      startTimestamp: Date.now(),
+      instance: true,
+    }
+  }));
+}
+
+chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
+  console.log('Window Changed', activeWindowId);
+  if(activeWindowId >= 0){
+    chrome.tabs.query({ active: true, windowId: activeWindowId }, function (tabs) {
+      if(tabs.length){
+        tabFocusChanged(tabs[0]);
       }
-    }));
+    });
+  }else{
+    console.log('Browser not focused')
+  }
+});
+
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+  console.log('Tab Changed', activeInfo.tabId);
+  chrome.tabs.get(activeInfo.tabId, function(tab){
+    tabFocusChanged(tab);
   });
 });
