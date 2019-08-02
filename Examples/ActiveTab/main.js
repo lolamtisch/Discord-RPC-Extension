@@ -1,7 +1,7 @@
 var extensionId = "londahcleefkodmnlammpkcdjekmmafj";
 
 // Register Presence
-chrome.runtime.sendMessage(extensionId, getPresence(), function(response) {
+chrome.runtime.sendMessage(extensionId, '', function(response) {
   console.log('Presence registred')
 });
 
@@ -12,13 +12,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 });
 
 // Return Presence
+var time = Date.now()
 function getPresence(){
   return {
     clientId: '606504719212478504',
     presence: {
-      state: document.title,
+      state: document.title ? document.title : window.location.hostname,
       details: '🍱',
-      startTimestamp: Date.now(),
+      startTimestamp: time,
       instance: true,
     }
   };

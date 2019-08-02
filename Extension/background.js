@@ -20,14 +20,22 @@ function onOpen(){
 }
 
 var activeTab = {};
+var activeInterval;
 
 function checkActiveTab(tabId){
+  clearInterval(activeInterval);
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
-    chrome.runtime.sendMessage(activeTab[tabId].extId, activeTab[tabId].tabId, function(response) {
-      console.log('response', response);
-      websocket.send(JSON.stringify(response));
-    });
+    requestPresence();
+    activeInterval = setInterval(function(){
+      requestPresence();
+    }, 15000);
+    function requestPresence(){
+      chrome.runtime.sendMessage(activeTab[tabId].extId, activeTab[tabId].tabId, function(response) {
+        console.log('response', response);
+        websocket.send(JSON.stringify(response));
+      });
+    }
   }
 }
 
@@ -57,7 +65,7 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
     tabId: sender.tab.id
   };
   sendResponse({status: true});
-  if(sender.tab.active && request){
-    websocket.send(JSON.stringify(request));
+  if(sender.tab.active){
+    checkActiveTab(sender.tab.id);
   }
 });
