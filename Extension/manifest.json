@@ -7,5 +7,5 @@
     "scripts": ["background.js"],
     "persistent": false
   },
-  "permissions": ["background"]
+  "permissions": ["background", "tabs"]
 }

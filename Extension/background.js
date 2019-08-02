@@ -18,3 +18,19 @@ function onOpen(){
   }));
   console.log('Send');
 }
+
+chrome.tabs.onActivated.addListener(function(activeInfo) {
+  console.log(activeInfo);
+  chrome.tabs.get(activeInfo.tabId, function(tab){
+    console.log(tab.title);
+    websocket.send(JSON.stringify({
+      clientId: '606504719212478504',
+      presence: {
+        state: tab.title,
+        details: '🍱',
+        startTimestamp: Date.now(),
+        instance: true,
+      }
+    }));
+  });
+});
