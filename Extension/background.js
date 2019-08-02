@@ -33,10 +33,22 @@ function checkActiveTab(tabId){
     function requestPresence(){
       chrome.runtime.sendMessage(activeTab[tabId].extId, activeTab[tabId].tabId, function(response) {
         console.log('response', response);
-        websocket.send(JSON.stringify(response));
+        if(response){
+          websocket.send(JSON.stringify(response));
+        }else{
+          // Unregister Presence
+          console.log('Unregister Presence', tabId);
+          delete activeTab[tabId];
+          clearInterval(activeInterval);
+          disconnect();
+        }
       });
     }
   }
+}
+
+function disconnect(){
+  websocket.send(JSON.stringify({action: 'disconnect'}));
 }
 
 chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
@@ -49,7 +61,7 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
     });
   }else{
     console.log('Browser not focused');
-    websocket.send(JSON.stringify({action: 'disconnect'}));
+    disconnect();
   }
 });
 
