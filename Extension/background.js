@@ -51,10 +51,13 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 });
 
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
-  console.log('Message', request, sender);
+  console.log('Register', request, sender);
   activeTab[sender.tab.id] = {
     extId: sender.id,
     tabId: sender.tab.id
   };
   sendResponse({status: true});
+  if(sender.tab.active && request){
+    websocket.send(JSON.stringify(request));
+  }
 });
