@@ -1,33 +1,18 @@
 const discord = require('./Server/presence');
+const WebSocket = require('ws');
 
-discord.send('180984871685062656', {
-  state: 'slithering',
-  details: '🐍',
-  startTimestamp: Date.now(),
-  largeImageKey: 'snek_large',
-  smallImageKey: 'snek_small',
-  instance: true,
+const wss = new WebSocket.Server({
+  port: 6969
 });
 
-setTimeout(() => {
-  console.log('Switch')
-  discord.send('606504719212478504', {
-    state: 'slithering',
-    details: '🐍',
-    startTimestamp: Date.now(),
-    instance: true,
+wss.on('connection', function connection(ws) {
+  console.log('Connected');
+  ws.on('message', function incoming(data) {
+    data = JSON.parse(data);
+    console.log('Recived', data);
+    discord.send(data.clientId, data.presence);
   });
-}, 6000);
+  ws.send('Connected!');
+});
 
-var inter = setInterval(function(){
-  discord.keepAlive();
-}, 1000)
-
-timeout = setTimeout(() => {
-  console.log('Kill')
-  clearInterval(inter);
-}, 12000);
-
-setInterval(function(){
-
-}, 1000)
+process.stdin.resume();

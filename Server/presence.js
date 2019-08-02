@@ -10,8 +10,8 @@ function resetTimeout(){
   clearTimeout(timeout);
   timeout = setTimeout(() => {
     console.log('Timeout! Disconnecting');
-    client.updatePresence();
     client.disconnect();
+    currentId = 0;
   }, 30000);
 }
 
