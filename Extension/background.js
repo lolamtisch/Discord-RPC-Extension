@@ -47,7 +47,7 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
   console.log('Tab Changed', activeInfo.tabId);
-  checkActiveTab(activeInfo);
+  checkActiveTab(activeInfo.tabId);
 });
 
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
