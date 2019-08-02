@@ -19,17 +19,16 @@ function onOpen(){
   console.log('Send');
 }
 
-function tabFocusChanged(tab){
-  console.log(tab.title);
-  websocket.send(JSON.stringify({
-    clientId: '606504719212478504',
-    presence: {
-      state: tab.title,
-      details: '🍱',
-      startTimestamp: Date.now(),
-      instance: true,
-    }
-  }));
+var activeTab = {};
+
+function checkActiveTab(tabId){
+  if(typeof activeTab[tabId] !== 'undefined'){
+    console.log('Script Found', activeTab[tabId]);
+    chrome.runtime.sendMessage(activeTab[tabId].extId, activeTab[tabId].tabId, function(response) {
+      console.log('response', response);
+      websocket.send(JSON.stringify(response));
+    });
+  }
 }
 
 chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
@@ -37,7 +36,7 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
   if(activeWindowId >= 0){
     chrome.tabs.query({ active: true, windowId: activeWindowId }, function (tabs) {
       if(tabs.length){
-        tabFocusChanged(tabs[0]);
+        checkActiveTab(tabs[0].id);
       }
     });
   }else{
@@ -48,7 +47,14 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
 
 chrome.tabs.onActivated.addListener(function(activeInfo) {
   console.log('Tab Changed', activeInfo.tabId);
-  chrome.tabs.get(activeInfo.tabId, function(tab){
-    tabFocusChanged(tab);
-  });
+  checkActiveTab(activeInfo);
+});
+
+chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
+  console.log('Message', request, sender);
+  activeTab[sender.tab.id] = {
+    extId: sender.id,
+    tabId: sender.tab.id
+  };
+  sendResponse({status: true});
 });
