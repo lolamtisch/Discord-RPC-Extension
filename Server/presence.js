@@ -1,0 +1,33 @@
+const discordRpc = require('discord-rich-presence')
+
+var currentId = 0;
+
+var client;
+
+var timeout;
+
+function resetTimeout(){
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    console.log('Timeout! Disconnecting');
+    client.updatePresence();
+    client.disconnect();
+  }, 30000);
+}
+
+module.exports = {
+  send: function(clientId, presence){
+    if(currentId !== clientId || !currentId){
+      if(typeof client !== 'undefined'){
+        client.disconnect();
+      }
+      client = discordRpc(clientId);
+      currentId = clientId;
+    }
+    client.updatePresence(presence);
+    resetTimeout();
+  },
+  keepAlive: function(){
+    resetTimeout();
+  }
+}
