@@ -1,22 +1,20 @@
-console.log('Start');
-var websocket = new WebSocket("ws://localhost:6969");
-websocket.onopen = function (evt) {onOpen(evt)};
-websocket.onclose = function (evt) {onClose(evt)};
-websocket.onerror = function (evt) {onError(evt)};
-function onClose(){onOpen();}
-function onError(){websocket.close();}
+var websocket;
 
-function onOpen(){
-  websocket.send(JSON.stringify({
-    clientId: '606504719212478504',
-    presence: {
-      state: 'Testing',
-      details: '🍱',
-      startTimestamp: Date.now(),
-      instance: true,
+async function websocketReady(){
+  return new Promise(function(resolve, reject){
+    if(typeof websocket !== 'undefined' && websocket.readyState === 1){// Connection is fine
+      resolve();
+      return;
     }
-  }));
-  console.log('Send');
+    websocket = new WebSocket("ws://localhost:6969");
+    websocket.onerror = function(evt) {
+      console.error(evt);
+      reject('Could not connect to Server');
+    };
+    websocket.onopen = function (evt) {
+      resolve();
+    };
+  })
 }
 
 var activeTab = {};
@@ -34,7 +32,7 @@ function checkActiveTab(tabId){
       chrome.runtime.sendMessage(activeTab[tabId].extId, activeTab[tabId].tabId, function(response) {
         console.log('response', response);
         if(response){
-          websocket.send(JSON.stringify(response));
+          sendPresence(response)
         }else{
           // Unregister Presence
           console.log('Unregister Presence', tabId);
@@ -49,8 +47,19 @@ function checkActiveTab(tabId){
   }
 }
 
+function sendPresence(pres){
+  websocketReady()
+    .then(() => {
+      websocket.send(JSON.stringify(pres));
+    })
+
+}
+
 function disconnect(){
-  websocket.send(JSON.stringify({action: 'disconnect'}));
+  websocketReady()
+    .then(() => {
+      websocket.send(JSON.stringify({action: 'disconnect'}));
+    });
 }
 
 chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
