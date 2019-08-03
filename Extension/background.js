@@ -20,32 +20,42 @@ function onOpen(){
 }
 
 var activeTab = {};
+var passiveTab = {};
 var activeInterval;
 
 function checkActiveTab(tabId){
   clearInterval(activeInterval);
+  var passiveTabArray = Object.values(passiveTab);
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
-    requestPresence();
+    requestPresence(activeTab[tabId], () => {delete activeTab[tabId];});
     activeInterval = setInterval(function(){
-      requestPresence();
+      requestPresence(activeTab[tabId], () => {delete activeTab[tabId];});
     }, 15000);
-    function requestPresence(){
-      chrome.runtime.sendMessage(activeTab[tabId].extId, activeTab[tabId].tabId, function(response) {
-        console.log('response', response);
-        if(response){
-          websocket.send(JSON.stringify(response));
-        }else{
-          // Unregister Presence
-          console.log('Unregister Presence', tabId);
-          delete activeTab[tabId];
-          clearInterval(activeInterval);
-          disconnect();
-        }
-      });
-    }
+  }else if(passiveTabArray.length){
+    console.log('Passive Found', passiveTabArray[0]);
+    requestPresence(passiveTabArray[0], () => {delete passiveTab[passiveTabArray[0].tabId];});
+    activeInterval = setInterval(function(){
+      requestPresence(passiveTabArray[0], () => {delete passiveTab[passiveTabArray[0].tabId];});
+    }, 15000);
   }else{
     disconnect();
+  }
+
+  function requestPresence(tabInfo, removeTab){
+    chrome.runtime.sendMessage(tabInfo.extId, tabInfo.tabId, function(response) {
+      console.log('response', response);
+      if(response){
+        websocket.send(JSON.stringify(response));
+      }else{
+        // Unregister Presence
+        console.log('Unregister Presence', tabId);
+        removeTab();
+        clearInterval(activeInterval);
+        disconnect();
+        checkActiveTab(tabId);
+      }
+    });
   }
 }
 
@@ -63,7 +73,7 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
     });
   }else{
     console.log('Browser not focused');
-    disconnect();
+    checkActiveTab(0);
   }
 });
 
@@ -74,10 +84,18 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
   console.log('Register', request, sender);
-  activeTab[sender.tab.id] = {
-    extId: sender.id,
-    tabId: sender.tab.id
-  };
+  if(request.mode == 'passive'){
+    passiveTab[sender.tab.id] = {
+      extId: sender.id,
+      tabId: sender.tab.id
+    };
+  }else{
+    activeTab[sender.tab.id] = {
+      extId: sender.id,
+      tabId: sender.tab.id
+    };
+  }
+
   sendResponse({status: true});
   if(sender.tab.active){
     checkActiveTab(sender.tab.id);

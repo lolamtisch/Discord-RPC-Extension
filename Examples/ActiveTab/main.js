@@ -1,7 +1,7 @@
 var extensionId = "londahcleefkodmnlammpkcdjekmmafj";
 
 // Register Presence
-chrome.runtime.sendMessage(extensionId, '', function(response) {
+chrome.runtime.sendMessage(extensionId, {mode: 'active'}, function(response) {
   console.log('Presence registred')
 });
 
