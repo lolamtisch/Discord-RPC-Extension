@@ -26,15 +26,17 @@ function checkActiveTab(tabId){
   var passiveTabArray = Object.values(passiveTab);
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
-    requestPresence(activeTab[tabId], () => {delete activeTab[tabId];});
+    var data = [activeTab[tabId], () => {delete activeTab[tabId];}];
+    requestPresence(...data);
     activeInterval = setInterval(function(){
-      requestPresence(activeTab[tabId], () => {delete activeTab[tabId];});
+      requestPresence(...data);
     }, 15000);
   }else if(passiveTabArray.length){
     console.log('Passive Found', passiveTabArray[0]);
-    requestPresence(passiveTabArray[0], () => {delete passiveTab[passiveTabArray[0].tabId];});
+    var data = [passiveTabArray[0], () => {delete passiveTab[passiveTabArray[0].tabId];}]
+    requestPresence(...data);
     activeInterval = setInterval(function(){
-      requestPresence(passiveTabArray[0], () => {delete passiveTab[passiveTabArray[0].tabId];});
+      requestPresence(...data);
     }, 15000);
   }else{
     disconnect();
