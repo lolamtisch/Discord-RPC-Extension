@@ -17,7 +17,11 @@ function resetTimeout(){
 
 function disconnect(){
   clearTimeout(timeout);
-  client.disconnect();
+  if(currentId && typeof client !== 'undefined'){
+    client.disconnect();
+  }else{
+    console.log('Could not disconnect. Because not connected.')
+  }
   currentId = 0;
 }
 
