@@ -6,8 +6,8 @@ chrome.runtime.sendMessage(extensionId, {mode: 'passive'}, function(response) {
 });
 
 // Wait for presence Requests
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  console.log('Presence requested')
+chrome.runtime.onMessage.addListener(function(info, sender, sendResponse) {
+  console.log('Presence requested', info)
   sendResponse(getPresence());
 });
 

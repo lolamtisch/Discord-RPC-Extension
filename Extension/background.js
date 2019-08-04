@@ -26,14 +26,14 @@ function checkActiveTab(tabId){
   var passiveTabArray = Object.values(passiveTab);
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
-    var data = [activeTab[tabId], () => {delete activeTab[tabId];}];
+    var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}];
     requestPresence(...data);
     activeInterval = setInterval(function(){
       requestPresence(...data);
     }, 15000);
   }else if(passiveTabArray.length){
     console.log('Passive Found', passiveTabArray[0]);
-    var data = [passiveTabArray[0], () => {delete passiveTab[passiveTabArray[0].tabId];}]
+    var data = [passiveTabArray[0], {active: (passiveTabArray[0].tabId === tabId)}, () => {delete passiveTab[passiveTabArray[0].tabId];}]
     requestPresence(...data);
     activeInterval = setInterval(function(){
       requestPresence(...data);
@@ -42,8 +42,8 @@ function checkActiveTab(tabId){
     disconnect();
   }
 
-  function requestPresence(tabInfo, removeTab){
-    chrome.runtime.sendMessage(tabInfo.extId, tabInfo.tabId, function(response) {
+  function requestPresence(tabInfo, info, removeTab){
+    chrome.runtime.sendMessage(tabInfo.extId, {tab: tabInfo.tabId, info: info}, function(response) {
       console.log('response', response);
       if(response){
         sendPresence(response);
