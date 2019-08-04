@@ -46,7 +46,12 @@ function checkActiveTab(tabId){
     chrome.runtime.sendMessage(tabInfo.extId, {tab: tabInfo.tabId, info: info}, function(response) {
       console.log('response', response);
       if(response){
-        sendPresence(response);
+        if(typeof response.clientId !== 'undefined'){
+          sendPresence(response);
+        }else{
+          disconnect();
+        }
+
       }else{
         // Unregister Presence
         console.log('Unregister Presence', tabId);
