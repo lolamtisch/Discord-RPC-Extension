@@ -18,12 +18,11 @@ async function websocketReady(){
 }
 
 var activeTab = {};
-var passiveTab = {};
+var passiveTab = [];
 var activeInterval;
 
 function checkActiveTab(tabId){
   clearInterval(activeInterval);
-  var passiveTabArray = Object.values(passiveTab);
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
     var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}];
@@ -31,9 +30,9 @@ function checkActiveTab(tabId){
     activeInterval = setInterval(function(){
       requestPresence(...data);
     }, 15000);
-  }else if(passiveTabArray.length){
-    console.log('Passive Found', passiveTabArray[0]);
-    var data = [passiveTabArray[0], {active: (passiveTabArray[0].tabId === tabId)}, () => {delete passiveTab[passiveTabArray[0].tabId];}]
+  }else if(passiveTab.length){
+    console.log('Passive Found', passiveTab[0]);
+    var data = [passiveTab[0], {active: (passiveTab[0].tabId === tabId)}, () => {passiveTab.shift();}]
     requestPresence(...data);
     activeInterval = setInterval(function(){
       requestPresence(...data);
@@ -101,10 +100,14 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
   console.log('Register', request, sender);
   if(request.mode == 'passive'){
-    passiveTab[sender.tab.id] = {
+    passiveTab.unshift({
       extId: sender.id,
       tabId: sender.tab.id
-    };
+    });
+    passiveTab = passiveTab.filter((tab, i) => {
+      if(i === 0) return true;
+      return tab.tabId !== sender.tab.id;
+    });
   }else{
     activeTab[sender.tab.id] = {
       extId: sender.id,
