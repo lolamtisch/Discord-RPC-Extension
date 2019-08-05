@@ -73,6 +73,7 @@ function sendPresence(pres){
   websocketReady()
     .then(() => {
       websocket.send(JSON.stringify(pres));
+      setActivePresenceIcon()
     })
 
 }
@@ -81,6 +82,7 @@ function disconnect(){
   websocketReady()
     .then(() => {
       websocket.send(JSON.stringify({action: 'disconnect'}));
+      resetIcon()
     });
 }
 
@@ -122,3 +124,33 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
     checkActiveTab(sender.tab.id);
   }
 });
+
+function resetIcon(){
+  chrome.browserAction.setIcon({
+    path: "icons/icon16.png"
+  });
+}
+
+var img = new Image();
+img.src = chrome.extension.getURL('icons/icon16.png');
+function setActivePresenceIcon(){
+    var canvas = document.createElement('canvas');
+    canvas.width = 19;
+    canvas.height = 19;
+
+    var context = canvas.getContext('2d');
+
+    context.drawImage(img, 0, 0, 19, 19);
+
+    context.beginPath();
+    context.arc(14, 14, 5, 0, 2 * Math.PI);
+    context.fillStyle = 'lime';
+    context.fill();
+    context.lineWidth = 1;
+    context.strokeStyle = 'green';
+    context.stroke();
+
+    chrome.browserAction.setIcon({
+      imageData: context.getImageData(0, 0, 19, 19)
+    });
+}
