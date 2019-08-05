@@ -18,7 +18,7 @@ async function websocketReady(){
 }
 
 var activeTab = {};
-var passiveTab = [];
+var passiveTab = new Map();
 var activeInterval;
 
 function checkActiveTab(tabId){
@@ -30,9 +30,15 @@ function checkActiveTab(tabId){
     activeInterval = setInterval(function(){
       requestPresence(...data);
     }, 15000);
-  }else if(passiveTab.length){
-    console.log('Passive Found', passiveTab[0]);
-    var data = [passiveTab[0], {active: (passiveTab[0].tabId === tabId)}, () => {passiveTab.shift();}]
+  }else if(passiveTab.size){
+    if(passiveTab.has(tabId)){
+      var temp = passiveTab.get(tabId);
+      passiveTab.delete(tabId);
+      passiveTab.set(tabId, temp);
+    }
+    var tab = Array.from(passiveTab.values()).pop();
+    console.log('Passive Found', tab);
+    var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}]
     requestPresence(...data);
     activeInterval = setInterval(function(){
       requestPresence(...data);
@@ -100,13 +106,9 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
   console.log('Register', request, sender);
   if(request.mode == 'passive'){
-    passiveTab.unshift({
+    passiveTab.set(sender.tab.id, {
       extId: sender.id,
       tabId: sender.tab.id
-    });
-    passiveTab = passiveTab.filter((tab, i) => {
-      if(i === 0) return true;
-      return tab.tabId !== sender.tab.id;
     });
   }else{
     activeTab[sender.tab.id] = {

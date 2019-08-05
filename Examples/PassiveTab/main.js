@@ -35,8 +35,8 @@ function getPresence(info){
       return {
         clientId: '607153108375830548',
         presence: {
-          state: document.getElementsByClassName('playbackSoundBadge__titleContextContainer')[0].firstElementChild.textContent,
-          details: 'Paused',
+          state: 'Paused',
+          details: document.getElementsByClassName('playbackSoundBadge__titleLink')[0].lastElementChild.textContent,
           largeImageKey: "soundcloud",
           smallImageKey: "pause",
           instance: true,
