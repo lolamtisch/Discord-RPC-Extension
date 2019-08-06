@@ -17,6 +17,8 @@ async function websocketReady(){
   })
 }
 
+chrome.storage.local.set({'presence': null});
+
 var activeTab = {};
 var passiveTab = new Map();
 var activeInterval;
@@ -74,6 +76,7 @@ function sendPresence(pres){
     .then(() => {
       websocket.send(JSON.stringify(pres));
       setActivePresenceIcon()
+      chrome.storage.local.set({'presence': pres.presence})
     })
 
 }
@@ -82,7 +85,8 @@ function disconnect(){
   websocketReady()
     .then(() => {
       websocket.send(JSON.stringify({action: 'disconnect'}));
-      resetIcon()
+      resetIcon();
+      chrome.storage.local.set({'presence': null})
     });
 }
 
