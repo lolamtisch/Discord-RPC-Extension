@@ -28,6 +28,7 @@ chrome.storage.local.set({'presence': null});
 var activeTab = {};
 var passiveTab = new Map();
 var activeInterval;
+var focusTimeout;
 
 function checkActiveTab(tabId){
   clearInterval(activeInterval);
@@ -97,6 +98,7 @@ function disconnect(){
 }
 
 chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
+  clearTimeout(focusTimeout);
   console.log('Window Changed', activeWindowId);
   if(activeWindowId >= 0){
     chrome.tabs.query({ active: true, windowId: activeWindowId }, function (tabs) {
@@ -106,7 +108,10 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
     });
   }else{
     console.log('Browser not focused');
-    checkActiveTab(0);
+    focusTimeout = setTimeout(() => {
+      console.log('Focus Timeout');
+      checkActiveTab(0);
+    }, 5000);
   }
 });
 
