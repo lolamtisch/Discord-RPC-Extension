@@ -81,7 +81,6 @@ function sendPresence(pres){
   websocketReady()
     .then(() => {
       websocket.send(JSON.stringify(pres));
-      chrome.storage.local.set({'presence': pres.presence});
       currendState = pres.presence;
       setPresenceIcon();
     })
@@ -92,7 +91,6 @@ function disconnect(){
   websocketReady()
     .then(() => {
       websocket.send(JSON.stringify({action: 'disconnect'}));
-      chrome.storage.local.set({'presence': null});
       currendState = null;
       setPresenceIcon();
     });
@@ -135,6 +133,13 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   if(sender.tab.active){
     checkActiveTab(sender.tab.id);
   }
+});
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  sendResponse({
+    websocket: websocketOk,
+    presence: currendState
+  })
 });
 
 var img = new Image();

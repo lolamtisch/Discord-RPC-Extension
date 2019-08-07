@@ -1,8 +1,10 @@
 fillUi();
 function fillUi(){
-  chrome.storage.local.get(['presence'], function(presence) {
+  chrome.runtime.sendMessage("", function(presence) {
     console.log('Fill Ui', presence);
-    if(typeof presence.presence !== 'undefined' && presence.presence){
+    if(!presence.websocket){
+      var html = '<div><b>No active connection to the server</b></div>';
+    }else if(typeof presence.presence !== 'undefined' && presence.presence){
       presence = presence.presence;
       var time = '';
       if(typeof presence.startTimestamp !== 'undefined'){
