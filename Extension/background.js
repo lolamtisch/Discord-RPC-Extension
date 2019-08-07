@@ -1,4 +1,6 @@
 var websocket;
+var websocketOk = false;
+var currendState = null;
 
 async function websocketReady(){
   return new Promise(function(resolve, reject){
@@ -10,9 +12,13 @@ async function websocketReady(){
     websocket.onerror = function(evt) {
       console.error(evt);
       reject('Could not connect to Server');
+      websocketOk = false;
+      setPresenceIcon();
     };
     websocket.onopen = function (evt) {
       resolve();
+      websocketOk = true;
+      setPresenceIcon();
     };
   })
 }
@@ -75,8 +81,9 @@ function sendPresence(pres){
   websocketReady()
     .then(() => {
       websocket.send(JSON.stringify(pres));
-      setActivePresenceIcon()
-      chrome.storage.local.set({'presence': pres.presence})
+      chrome.storage.local.set({'presence': pres.presence});
+      currendState = pres.presence;
+      setPresenceIcon();
     })
 
 }
@@ -85,8 +92,9 @@ function disconnect(){
   websocketReady()
     .then(() => {
       websocket.send(JSON.stringify({action: 'disconnect'}));
-      resetIcon();
-      chrome.storage.local.set({'presence': null})
+      chrome.storage.local.set({'presence': null});
+      currendState = null;
+      setPresenceIcon();
     });
 }
 
@@ -129,15 +137,10 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   }
 });
 
-function resetIcon(){
-  chrome.browserAction.setIcon({
-    path: "icons/icon16.png"
-  });
-}
-
 var img = new Image();
 img.src = chrome.extension.getURL('icons/icon16.png');
-function setActivePresenceIcon(){
+function setPresenceIcon(){
+  if(currendState || !websocketOk){
     var canvas = document.createElement('canvas');
     canvas.width = 19;
     canvas.height = 19;
@@ -148,13 +151,29 @@ function setActivePresenceIcon(){
 
     context.beginPath();
     context.arc(14, 14, 5, 0, 2 * Math.PI);
-    context.fillStyle = 'lime';
+
+    if(!websocketOk){
+      context.fillStyle = 'red';
+    }else{
+      context.fillStyle = 'lime';
+    }
     context.fill();
     context.lineWidth = 1;
-    context.strokeStyle = 'green';
+    if(!websocketOk){
+      context.strokeStyle = 'red';
+    }else{
+      context.strokeStyle = 'green';
+    }
+
     context.stroke();
 
     chrome.browserAction.setIcon({
       imageData: context.getImageData(0, 0, 19, 19)
     });
+  }else{
+    chrome.browserAction.setIcon({
+      path: "icons/icon16.png"
+    });
+  }
+
 }
