@@ -64,7 +64,7 @@ function checkActiveTab(tabId){
     disconnect();
   }
 
-  function requestPresence(tabInfo, info, removeTab, disconnect = () => {}){
+  function requestPresence(tabInfo, info, removeTab, disconnectEvent = () => {}){
     chrome.runtime.sendMessage(tabInfo.extId, {tab: tabInfo.tabId, info: info}, function(response) {
       console.log('response', response);
       if(response){
@@ -72,6 +72,7 @@ function checkActiveTab(tabId){
           sendPresence(response);
         }else{
           disconnect();
+          disconnectEvent();
         }
 
       }else{
