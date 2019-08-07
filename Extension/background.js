@@ -45,18 +45,26 @@ function checkActiveTab(tabId){
       passiveTab.delete(tabId);
       passiveTab.set(tabId, temp);
     }
-    var tab = Array.from(passiveTab.values()).pop();
-    console.log('Passive Found', tab);
-    var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}]
-    requestPresence(...data);
-    activeInterval = setInterval(function(){
-      requestPresence(...data);
-    }, 15000);
+    var pTabs = Array.from(passiveTab.values());
+    passive();
+    function passive(){
+      if(pTabs.length){
+        clearInterval(activeInterval);
+        var tab = pTabs.pop();
+        console.log('Passive Found', tab);
+        var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}]
+        requestPresence(...data);
+        activeInterval = setInterval(function(){
+          requestPresence(...data);
+        }, 15000);
+      }
+
+    }
   }else{
     disconnect();
   }
 
-  function requestPresence(tabInfo, info, removeTab){
+  function requestPresence(tabInfo, info, removeTab, disconnect = () => {}){
     chrome.runtime.sendMessage(tabInfo.extId, {tab: tabInfo.tabId, info: info}, function(response) {
       console.log('response', response);
       if(response){
