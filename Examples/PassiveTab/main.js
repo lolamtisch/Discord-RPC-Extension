@@ -2,7 +2,7 @@ var extensionId = "ibpbmghbpjpjookgdkehfmfhnapijmeh";
 
 // Register Presence
 chrome.runtime.sendMessage(extensionId, {mode: 'passive'}, function(response) {
-  console.log('Presence registred')
+  console.log('Presence registred', response);
 });
 
 // Wait for presence Requests
