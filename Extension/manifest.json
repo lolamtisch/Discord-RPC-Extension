@@ -18,5 +18,5 @@
     "default_icon": "icons/icon16.png",
     "default_popup": "popup/popup.html"
   },
-  "permissions": ["background", "tabs", "storage"]
+  "permissions": ["tabs", "storage"]
 }

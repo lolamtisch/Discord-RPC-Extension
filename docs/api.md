@@ -46,6 +46,7 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   chrome.tabs.sendMessage(request.tab, request.info, function(response){
     sendResponse(response);
   });
+  return true;
 });
 ```
 You need to have this in your background script. It is used to forward requests to the content script.
