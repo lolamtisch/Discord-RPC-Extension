@@ -5,7 +5,7 @@ if(typeof browser !== 'undefined' && typeof chrome !== "undefined"){
 
 // Register Presence
 chrome.runtime.sendMessage(extensionId, {mode: 'active'}, function(response) {
-  console.log('Presence registred')
+  console.log('Presence registred', response)
 });
 
 // Wait for presence Requests
