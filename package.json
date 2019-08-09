@@ -13,7 +13,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:win": "pkg -c Server/pkg/win.json --out-path ./dist -t node10-win-x64 Server/win_tray_server.js && create-nodew-exe ./dist/server_win_64bit_debug.exe ./dist/server_win_64bit.exe"
+    "build:win": "npm run build:win:64 && npm run build:win:32",
+    "build:win:64": "pkg -c Server/pkg/win.json --out-path ./dist -t node10-win-x64 Server/win_tray_server.js && create-nodew-exe ./dist/server_win_64bit_debug.exe ./dist/server_win_64bit.exe",
+    "build:win:32": "pkg -c Server/pkg/win.json -o ./dist/server_win_32bit_debug.exe -t node10-win-x86 server.js && create-nodew-exe ./dist/server_win_32bit_debug.exe ./dist/server_win_32bit.exe"
   },
   "repository": {
     "type": "git",
