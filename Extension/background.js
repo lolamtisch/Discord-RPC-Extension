@@ -20,6 +20,9 @@ async function websocketReady(){
       websocketOk = true;
       setPresenceIcon();
     };
+    websocket.onmessage = function (evt) {
+      console.log("Connected", JSON.parse(evt.data));
+    };
   })
 }
 
