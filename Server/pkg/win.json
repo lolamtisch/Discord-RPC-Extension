@@ -1,0 +1,8 @@
+{
+  "name": "server_win_64bit",
+  "pkg": {
+    "assets": [
+      "./../../node_modules/systray/traybin/**/*release.exe"
+    ]
+  }
+}
