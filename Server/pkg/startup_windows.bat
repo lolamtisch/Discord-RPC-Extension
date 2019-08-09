@@ -20,8 +20,8 @@ if '%choice%'=='x' goto :exit
 :addstartup
 cls
 
-if exist %~dp0server-win-output.exe (
-    reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run\ /v "%keyname%" /t REG_SZ /d %~dp0server-win-output.exe
+if exist %~dp0server_win.exe (
+    reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run\ /v "%keyname%" /t REG_SZ /d %~dp0server_win.exe
 ) else (
     echo File not found!
 )
