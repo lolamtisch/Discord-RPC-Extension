@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:win": "pkg -c Server/pkg/win.json --out-path ./dist -t node10-win-x64 server.js && create-nodew-exe ./dist/server_win_64bit.exe ./dist/server_win_64bit_silent.exe"
+    "build:win": "pkg -c Server/pkg/win.json --out-path ./dist -t node10-win-x64 server.js && create-nodew-exe ./dist/server_win_64bit_debug.exe ./dist/server_win_64bit.exe"
   },
   "repository": {
     "type": "git",

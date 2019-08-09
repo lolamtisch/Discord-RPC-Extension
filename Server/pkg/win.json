@@ -1,5 +1,5 @@
 {
-  "name": "server_win_64bit",
+  "name": "server_win_64bit_debug",
   "pkg": {
     "assets": [
       "./../../node_modules/systray/traybin/**/*release.exe"
