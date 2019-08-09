@@ -23,7 +23,7 @@ wss.on('connection', function connection(ws) {
       discord.send(data.clientId, data.presence);
     }
   });
-  ws.send('Connected!');
+  ws.send(JSON.stringify({version: version}));
 });
 
 console.log('WebSocket created');
