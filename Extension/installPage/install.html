@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+<head>
+  <title>Discord Rich Presence</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=500">
+  <link rel="stylesheet" type="text/css" href="vendor/material.css">
+  <link rel="stylesheet" type="text/css" href="vendor/materialFont.css">
+  <style type="text/css">
+    p{
+      font-size: 16px;
+    }
+
+    #iconimage {
+      filter: contrast(1.1);
+      margin-top:-5px;
+      margin-right:10px;
+      border: 7px solid white;
+      border-radius: 50%;
+      height: 32px;
+      width: 32px;
+    }
+    .correctionGif{
+      background-color: black;
+      max-width: 100%;
+      min-height: 500px;
+      position: relative;
+      #hiddenimage {
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    }
+
+    .demo-ribbon {
+      width: 100%;
+      height: 40vh;
+      background-color: #3F51B5;
+      flex-shrink: 0;
+    }
+
+    .demo-main {
+      margin-top: -35vh;
+      flex-shrink: 0;
+    }
+
+    .demo-header .mdl-layout__header-row {
+      padding-left: 40px;
+    }
+
+    .demo-container {
+      max-width: 1600px;
+      width: calc(100% - 16px);
+      margin: 0 auto;
+    }
+
+    .demo-content {
+      border-radius: 2px;
+      padding: 80px 56px;
+      margin-bottom: 80px;
+    }
+
+    .demo-layout.is-small-screen .demo-content {
+      padding: 40px 28px;
+    }
+
+    .noMarginTop{
+      margin-top: 0;
+    }
+
+    .mainHeader{
+      margin-bottom: 56px;
+    }
+
+    .syncExtended{
+      background-color: #f9f9f9;
+      border: 1px solid rgba(0,0,0,.12);
+      border-top: none;
+    }
+  </style>
+</head>
+
+<body id="Mal-Sync-Popup">
+  <div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
+    <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
+      <div class="mdl-layout__header-row">
+
+        <span class="mdl-layout-title">
+        <img id=iconimage height="32" width="32" src="https://github.com/lolamtisch/Discord-RPC-Extension/blob/master/Extension/icons/icon128.png?raw=true"></img>Discord Rich Presence</span>
+        <div class="mdl-layout-spacer"></div>
+      </div>
+    </header>
+    <div class="demo-ribbon"></div>
+    <main class="demo-main mdl-layout__content">
+      <div class="demo-container mdl-grid">
+        <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+        <div class="mdl-cell mdl-cell--8-col">
+          <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800">
+
+            <h3 class="noMarginTop mainHeader" style="color: #ff3a3a;">Important!</h3>
+
+            <p>
+              This extension <b>only</b> works in combination with the desktop application.<br>
+              Please download and install it from this page:
+              <a href="https://github.com/lolamtisch/Discord-RPC-Extension/releases/latest" target="_blank">Download</a>
+            </p>
+
+            <p>
+              This extension does not contain any presences.<br>
+              They are added by another extension that communicate with this extension.<br>
+              Some of these extensions can be found here: <a href="https://github.com/lolamtisch/Discord-RPC-Extension/blob/master/docs/extensions.md" target="_blank">Compatible Extensions</a>
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="vendor/material.js"></script>
+</body>
+</html>
