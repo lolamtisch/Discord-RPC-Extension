@@ -1,0 +1,8 @@
+{
+  "name": "server_macos_debug",
+  "pkg": {
+    "assets": [
+      "./../../node_modules/systray/traybin/**/*darwin*"
+    ]
+  }
+}
