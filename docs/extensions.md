@@ -1,4 +1,4 @@
-## Complatible Extensions
+## Compatible Extensions
 <table>
   <tr>
     <td><!--Title-->Discord-RPC-Pack</td>
