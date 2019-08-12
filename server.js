@@ -2,6 +2,14 @@ const version = "0.0.1";
 const discord = require('./Server/presence');
 const WebSocket = require('ws');
 
+process.on('uncaughtException', function(e) {
+  console.log('Uncaught Exception...');
+  console.log(e.stack);
+  setTimeout(function(){
+    process.exit(99);
+  }, 10000);
+});
+
 console.log("Starting", version);
 
 const wss = new WebSocket.Server({
