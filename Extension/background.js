@@ -90,14 +90,59 @@ function checkActiveTab(tabId){
   }
 }
 
+function sanitizePresence(pres) {
+  //if emtpy
+  if(typeof pres.presence.details !== 'undefined' && pres.presence.details === "") {
+    delete pres.presence.details;
+  }
+  if(typeof pres.presence.state !== 'undefined' && pres.presence.state  === "") {
+    delete pres.presence.state;
+  }
+  if(typeof pres.presence.largeImageKey !== 'undefined' && pres.presence.largeImageKey === "") {
+    delete pres.presence.largeImageKey;
+  }
+  if(typeof pres.presence.smallImageKey !== 'undefined' && pres.presence.smallImageKey === "") {
+    delete pres.presence.smallImageKey;
+  }
+  if(typeof pres.presence.largeImageText !== 'undefined' && pres.presence.largeImageText === "") {
+    delete pres.presence.largeImageText;
+  }
+  if(typeof pres.presence.smallImageText !== 'undefined' && pres.presence.smallImageText === "") {
+    delete pres.presence.smallImageText;
+  }
+
+  //party
+  if (!/^\d+$/.test(pres.presence.partySize) || !/^\d+$/.test(pres.presence.partyMax) || pres.presence.partySize > pres.presence.partyMax){
+    delete pres.presence.partySize;
+    delete pres.presence.partyMax;
+  }
+  //state
+  if(typeof pres.presence.state !== 'undefined') {
+   pres.presence.state = pres.presence.state.substring(0,127);
+  }
+  //details
+  if(typeof pres.presence.details !== 'undefined') {
+    pres.presence.details = pres.presence.details.substring(0,127);
+  }
+  //endtimestamp
+  if (typeof pres.presence.endTimestamp !== 'undefined' && (!/^\d+$/.test(pres.presence.endTimestamp) || pres.presence.endTimestamp === "")){
+    delete pres.presence.endTimestamp;
+  }
+  //starttimestamp
+  if (typeof pres.presence.startTimestamp !== 'undefined' && (!/^\d+$/.test(pres.presence.startTimestamp) || pres.presence.startTimestamp === "")){
+    delete pres.presence.startTimestamp;
+  }
+  return pres;
+}
+
 function sendPresence(pres){
   websocketReady()
-    .then(() => {
-      websocket.send(JSON.stringify(pres));
-      currendState = pres.presence;
-      setPresenceIcon();
-    })
-
+  .then(() => {
+    pres = sanitizePresence(pres);
+    websocket.send(JSON.stringify(pres));
+    currendState = pres.presence;
+    setPresenceIcon();
+  })
 }
 
 function disconnect(){
