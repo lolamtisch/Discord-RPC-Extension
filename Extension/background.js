@@ -120,7 +120,7 @@ function sanitizePresence(pres) {
   if(typeof pres.presence.state !== 'undefined') {
    pres.presence.state = pres.presence.state.substring(0,127);
   }
-  //details 
+  //details
   if(typeof pres.presence.details !== 'undefined') {
     pres.presence.details = pres.presence.details.substring(0,127);
   }
@@ -129,7 +129,7 @@ function sanitizePresence(pres) {
     delete pres.presence.endTimestamp;
   }
   //starttimestamp
-  if (typeof pres.presence.startTimestamp !== 'undefined' && (!/^\d+$/.test(pres.presence.endTimestamp) || pres.presence.startTimestamp === "")){
+  if (typeof pres.presence.startTimestamp !== 'undefined' && (!/^\d+$/.test(pres.presence.startTimestamp) || pres.presence.startTimestamp === "")){
     delete pres.presence.startTimestamp;
   }
   return pres;
