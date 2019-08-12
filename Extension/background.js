@@ -2,6 +2,15 @@ var websocket;
 var websocketOk = false;
 var currendState = null;
 
+chrome.runtime.onInstalled.addListener(function(details){
+    if(details.reason == "install"){
+      chrome.tabs.create({url: chrome.extension.getURL('installPage/install.html')}, function (tab) {
+        con.info("Open installPage");
+      });
+    }else if(details.reason == "update"){
+    }
+});
+
 async function websocketReady(){
   return new Promise(function(resolve, reject){
     if(typeof websocket !== 'undefined' && websocket.readyState === 1){// Connection is fine
