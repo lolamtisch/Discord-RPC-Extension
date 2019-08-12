@@ -1,0 +1,8 @@
+{
+  "name": "server_linux_debug",
+  "pkg": {
+    "assets": [
+      "./../../node_modules/systray/traybin/**/*linux*"
+    ]
+  }
+}
