@@ -120,6 +120,14 @@ function sanitizePresence(pres) {
     delete pres.presence.smallImageText;
   }
 
+  if (typeof pres.presence.endTimestamp !== 'undefined'){
+    pres.presence.endTimestamp = Math.round(pres.presence.endTimestamp);
+  }
+
+  if (typeof pres.presence.startTimestamp !== 'undefined'){
+    pres.presence.startTimestamp = Math.round(pres.presence.startTimestamp);
+  }
+
   //party
   if (!/^\d+$/.test(pres.presence.partySize) || !/^\d+$/.test(pres.presence.partyMax) || pres.presence.partySize > pres.presence.partyMax){
     delete pres.presence.partySize;
