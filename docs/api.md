@@ -51,3 +51,5 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
 ```
 You need to have this in your background script. It is used to forward requests to the content script.
 
+## Support
+If you still have problems. You can drop by on my discord server [Here](https://discordapp.com/invite/cTH4yaw)
