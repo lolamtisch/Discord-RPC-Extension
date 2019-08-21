@@ -1,4 +1,5 @@
-fillUi();
+var api;
+
 function fillUi(){
   chrome.runtime.sendMessage("", function(presence) {
     console.log('Fill Ui', presence);
@@ -26,7 +27,7 @@ function fillUi(){
         ${state}
         ${time}
         <div class="page-config">
-          <button id="disable-page" class="disable-page enabled" data-domain="${domain}" title="Disable this page">
+          <button id="disable-page" class="disable-page ${(api.disabledDomains.includes(domain)) ? 'disabled' : 'enabled'}" data-domain="${domain}" title="Disable this page">
             <img src="https://www.google.com/s2/favicons?domain=${domain}">
             <i class="i-disabled material-icons">
               not_interested
@@ -45,14 +46,37 @@ function fillUi(){
   });
 }
 
-document.addEventListener('click', function(e){
- if(e.target && e.target.id== 'disable-page'){
-    if(e.target.classList.contains('enabled')){
-      e.target.classList.remove('enabled');
-      e.target.classList.add('disabled');
-    }else{
-      e.target.classList.add('enabled');
-      e.target.classList.remove('disabled');
+chrome.storage.sync.get(['disabledDomains'], function(result) {
+  api = result;
+  if(typeof api.disabledDomains === 'undefined') api.disabledDomains = [];
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    console.log('update', changes)
+    if(namespace === 'sync'){
+      for (var key in changes) {
+        api[key] = changes[key].newValue;
+      }
     }
+    fillUi();
+  });
+  console.log('Disabled Domains', api.disabledDomains);
+
+  fillUi();
+
+  function removeDomain(domain){
+    api.disabledDomains = api.disabledDomains.filter(function(e) { return e !== domain })
+    chrome.storage.sync.set({'disabledDomains': api.disabledDomains});
   }
+  function addDomain(domain){
+    api.disabledDomains.push(domain);
+    chrome.storage.sync.set({'disabledDomains': api.disabledDomains});
+  }
+  document.addEventListener('click', function(e){
+   if(e.target && e.target.id== 'disable-page'){
+      if(e.target.classList.contains('enabled')){
+        addDomain(e.target.dataset.domain);
+      }else{
+        removeDomain(e.target.dataset.domain);
+      }
+    }
+  });
 });
