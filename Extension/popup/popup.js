@@ -3,7 +3,8 @@ var api;
 function fillUi(){
   chrome.runtime.sendMessage("", function(presence) {
     console.log('Fill Ui', presence);
-    var domain = presence.state.tabInfo.domain;
+    var domain = '';
+    if(typeof presence.state !== 'undefined' && presence.state) domain = presence.state.tabInfo.domain;
 
     var blacklist = api.disabledDomains.filter(function(e) { return e !== domain });
     var blackHtml = '';
