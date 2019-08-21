@@ -38,9 +38,17 @@
             pointer-events: none;}
           .disable-page i{
             position: absolute;
+            display: none;
             left: 0px;
             top: 0px;
             pointer-events: none;}
+          .disable-page.enabled .i-enabled{
+            display: block;
+          }
+          .disable-page.disabled .i-disabled{
+            display: block;
+            color: #ffa4a4;
+          }
 
 
     </style>

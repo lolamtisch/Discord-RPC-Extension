@@ -26,10 +26,13 @@ function fillUi(){
         ${state}
         ${time}
         <div class="page-config">
-          <button id="disable-page" class="disable-page" data-domain="${domain}" title="Disable this page">
+          <button id="disable-page" class="disable-page enabled" data-domain="${domain}" title="Disable this page">
             <img src="https://www.google.com/s2/favicons?domain=${domain}">
-            <i class="material-icons">
+            <i class="i-disabled material-icons">
               not_interested
+            </i>
+            <i class="i-enabled material-icons">
+              panorama_fish_eye
             </i>
           </button>
         </div>
@@ -44,6 +47,12 @@ function fillUi(){
 
 document.addEventListener('click', function(e){
  if(e.target && e.target.id== 'disable-page'){
-    alert(e.target.dataset.domain);
+    if(e.target.classList.contains('enabled')){
+      e.target.classList.remove('enabled');
+      e.target.classList.add('disabled');
+    }else{
+      e.target.classList.add('enabled');
+      e.target.classList.remove('disabled');
+    }
   }
 });
