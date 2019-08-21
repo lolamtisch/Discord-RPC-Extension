@@ -47,7 +47,7 @@ function fillUi(){
         ${time}
         <div class="page-config">
           ${blackHtml}
-          <button class="disable-page ${(api.disabledDomains.includes(domain)) ? 'disabled' : 'enabled'}" data-domain="${domain}" title="${blackDomain}">
+          <button class="disable-page ${(api.disabledDomains.includes(domain)) ? 'disabled' : 'enabled'}" data-domain="${domain}" title="${domain}">
             <img src="https://www.google.com/s2/favicons?domain=${domain}">
             <i class="i-disabled material-icons">
               not_interested

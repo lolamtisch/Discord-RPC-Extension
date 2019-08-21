@@ -1,6 +1,23 @@
 var websocket;
 var websocketOk = false;
 var currendState = null;
+var api = {
+  disabledDomains: [],
+}
+
+chrome.storage.sync.get(['disabledDomains'], function(result) {
+  api = result;
+  if(typeof api.disabledDomains === 'undefined') api.disabledDomains = [];
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    console.log('update', changes)
+    if(namespace === 'sync'){
+      for (var key in changes) {
+        api[key] = changes[key].newValue;
+      }
+    }
+  });
+  console.log('Disabled Domains', api.disabledDomains);
+});
 
 chrome.runtime.onInstalled.addListener(function(details){
     if(details.reason == "install"){
@@ -77,6 +94,12 @@ function checkActiveTab(tabId){
   }
 
   function requestPresence(tabInfo, info, removeTab, disconnectEvent = () => {}){
+    if(api.disabledDomains.includes(tabInfo.domain)){
+      console.log('Filter', tabInfo.domain);
+      disconnect();
+      disconnectEvent();
+      return;
+    }
     chrome.runtime.sendMessage(tabInfo.extId, {tab: tabInfo.tabId, info: info}, function(response) {
       console.log('response', response);
       if(response){
