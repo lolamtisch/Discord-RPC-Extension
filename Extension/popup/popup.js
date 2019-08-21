@@ -4,8 +4,9 @@ function fillUi(){
     console.log('Fill Ui', presence);
     if(!presence.websocket){
       var html = '<div><b>No active connection to the server</b></div>';
-    }else if(typeof presence.presence !== 'undefined' && presence.presence){
-      presence = presence.presence;
+    }else if(typeof presence.state !== 'undefined' && presence.state){
+      var domain = presence.state.tabInfo.domain;
+      presence = presence.state.presence;
       var time = '';
       if(typeof presence.startTimestamp !== 'undefined'){
         time = '<div>XX:XX elapsed</div>';
@@ -25,8 +26,8 @@ function fillUi(){
         ${state}
         ${time}
         <div class="page-config">
-          <button class="disable-page" title="Disable this page">
-            <img src="https://www.google.com/s2/favicons?domain=youtube.com">
+          <button id="disable-page" class="disable-page" data-domain="${domain}" title="Disable this page">
+            <img src="https://www.google.com/s2/favicons?domain=${domain}">
             <i class="material-icons">
               not_interested
             </i>
@@ -40,3 +41,9 @@ function fillUi(){
     document.getElementById('main').innerHTML = html;
   });
 }
+
+document.addEventListener('click', function(e){
+ if(e.target && e.target.id== 'disable-page'){
+    alert(e.target.dataset.domain);
+  }
+});

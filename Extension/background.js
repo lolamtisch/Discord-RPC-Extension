@@ -81,7 +81,7 @@ function checkActiveTab(tabId){
       console.log('response', response);
       if(response){
         if(typeof response.clientId !== 'undefined'){
-          sendPresence(response);
+          sendPresence(response, tabInfo);
         }else{
           disconnect();
           disconnectEvent();
@@ -152,12 +152,15 @@ function sanitizePresence(pres) {
   return pres;
 }
 
-function sendPresence(pres){
+function sendPresence(pres, tapInfo){
   websocketReady()
   .then(() => {
     pres = sanitizePresence(pres);
     websocket.send(JSON.stringify(pres));
-    currendState = pres.presence;
+    currendState = {
+      presence: pres.presence,
+      tabInfo: tapInfo
+    };
     setPresenceIcon();
   })
 }
@@ -198,11 +201,13 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   console.log('Register', request, sender);
   if(request.mode == 'passive'){
     passiveTab.set(sender.tab.id, {
+      domain: getDomain(sender.url),
       extId: sender.id,
       tabId: sender.tab.id
     });
   }else{
     activeTab[sender.tab.id] = {
+      domain: getDomain(sender.url),
       extId: sender.id,
       tabId: sender.tab.id
     };
@@ -212,12 +217,18 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   if(sender.tab.active){
     checkActiveTab(sender.tab.id);
   }
+
+  function getDomain(url){
+    url = url.split('/')[2];
+    url = url.replace(/www.?\./i, '');
+    return url;
+  }
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   sendResponse({
     websocket: websocketOk,
-    presence: currendState
+    state: currendState
   })
 });
 
