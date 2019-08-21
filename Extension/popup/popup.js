@@ -24,6 +24,14 @@ function fillUi(){
         ${details}
         ${state}
         ${time}
+        <div class="page-config">
+          <button class="disable-page" title="Disable this page">
+            <img src="https://www.google.com/s2/favicons?domain=youtube.com">
+            <i class="material-icons">
+              not_interested
+            </i>
+          </button>
+        </div>
       `;
     }else{
       var html = '<div><b>No Presence Active</b></div>';
