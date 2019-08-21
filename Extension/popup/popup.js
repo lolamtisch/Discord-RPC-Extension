@@ -3,10 +3,28 @@ var api;
 function fillUi(){
   chrome.runtime.sendMessage("", function(presence) {
     console.log('Fill Ui', presence);
+    var domain = presence.state.tabInfo.domain;
+
+    var blacklist = api.disabledDomains.filter(function(e) { return e !== domain });
+    var blackHtml = '';
+    for (var key in blacklist) {
+      blackDomain = blacklist[key];
+      blackHtml += `
+        <button class="disable-page disabled" data-domain="${blackDomain}" title="${blackDomain}">
+          <img src="https://www.google.com/s2/favicons?domain=${blackDomain}">
+          <i class="i-disabled material-icons">
+            not_interested
+          </i>
+          <i class="i-enabled material-icons">
+            panorama_fish_eye
+          </i>
+        </button>
+      `;
+    }
+
     if(!presence.websocket){
       var html = '<div><b>No active connection to the server</b></div>';
     }else if(typeof presence.state !== 'undefined' && presence.state){
-      var domain = presence.state.tabInfo.domain;
       presence = presence.state.presence;
       var time = '';
       if(typeof presence.startTimestamp !== 'undefined'){
@@ -27,7 +45,8 @@ function fillUi(){
         ${state}
         ${time}
         <div class="page-config">
-          <button id="disable-page" class="disable-page ${(api.disabledDomains.includes(domain)) ? 'disabled' : 'enabled'}" data-domain="${domain}" title="Disable this page">
+          ${blackHtml}
+          <button class="disable-page ${(api.disabledDomains.includes(domain)) ? 'disabled' : 'enabled'}" data-domain="${domain}" title="${blackDomain}">
             <img src="https://www.google.com/s2/favicons?domain=${domain}">
             <i class="i-disabled material-icons">
               not_interested
@@ -39,7 +58,7 @@ function fillUi(){
         </div>
       `;
     }else{
-      var html = '<div><b>No Presence Active</b></div>';
+      var html = `<div><b>No Presence Active</b><div class="page-config">${blackHtml}</div></div>`;
     }
 
     document.getElementById('main').innerHTML = html;
@@ -71,7 +90,7 @@ chrome.storage.sync.get(['disabledDomains'], function(result) {
     chrome.storage.sync.set({'disabledDomains': api.disabledDomains});
   }
   document.addEventListener('click', function(e){
-   if(e.target && e.target.id== 'disable-page'){
+   if(e.target && e.target.classList.contains('disable-page')){
       if(e.target.classList.contains('enabled')){
         addDomain(e.target.dataset.domain);
       }else{
