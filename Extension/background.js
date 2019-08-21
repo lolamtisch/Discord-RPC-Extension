@@ -46,7 +46,7 @@ function checkActiveTab(tabId){
   clearInterval(activeInterval);
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
-    var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}];
+    var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}, () => {checkActiveTab(0);}];
     requestPresence(...data);
     activeInterval = setInterval(function(){
       requestPresence(...data);
