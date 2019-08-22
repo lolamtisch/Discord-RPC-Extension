@@ -95,8 +95,11 @@ function checkActiveTab(tabId){
 
   function requestPresence(tabInfo, info, removeTab, disconnectEvent = () => {}){
     if(api.disabledDomains.includes(tabInfo.domain)){
-      console.log('Filter', tabInfo.domain);
-      disconnect();
+      console.log('Filter', tabInfo, currendState);
+      if(currendState && typeof currendState.tabInfo !== 'undefined' && tabInfo.tabId === currendState.tabInfo.tabId){
+        disconnect();
+      }
+
       disconnectEvent();
       return;
     }
@@ -106,7 +109,9 @@ function checkActiveTab(tabId){
         if(typeof response.clientId !== 'undefined'){
           sendPresence(response, tabInfo);
         }else{
-          disconnect();
+          if(currendState && typeof currendState.tabInfo !== 'undefined' && tabInfo.tabId === currendState.tabInfo.tabId){
+            disconnect();
+          }
           disconnectEvent();
         }
 
