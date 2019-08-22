@@ -86,6 +86,8 @@ function checkActiveTab(tabId){
         activeInterval = setInterval(function(){
           requestPresence(...data);
         }, 15000);
+      }else{
+        disconnect();
       }
 
     }
