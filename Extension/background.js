@@ -64,10 +64,10 @@ function checkActiveTab(tabId){
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
     var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}, () => {checkActiveTab(0);}];
-    requestPresence(...data);
     activeInterval = setInterval(function(){
       requestPresence(...data);
     }, 15000);
+    requestPresence(...data);
   }else if(passiveTab.size){
     if(passiveTab.has(tabId)){
       var temp = passiveTab.get(tabId);
@@ -82,10 +82,10 @@ function checkActiveTab(tabId){
         var tab = pTabs.pop();
         console.log('Passive Found', tab);
         var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}]
-        requestPresence(...data);
         activeInterval = setInterval(function(){
           requestPresence(...data);
         }, 15000);
+        requestPresence(...data);
       }else{
         disconnect();
       }
