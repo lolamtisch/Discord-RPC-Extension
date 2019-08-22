@@ -1,5 +1,6 @@
 <html>
   <head>
+    <link rel="stylesheet" type="text/css" href="./../installPage/vendor/materialFont.css">
     <style type="text/css">
       html {
         background-color: #7289da;
@@ -15,6 +16,46 @@
       #main{
         margin: 10px;
       }
+      button{
+        background-color: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+      }
+      .page-config {
+        margin-top: 5px;
+        }
+        .disable-page{
+          position: relative;
+          padding: 0;
+          height: 24px;
+          width: 24px;}
+          .disable-page img{
+            position: absolute;
+            left: 4px;
+            top: 4px;
+            border-radius: 3px;
+            pointer-events: none;}
+          .disable-page i{
+            position: absolute;
+            display: none;
+            left: 0px;
+            top: 0px;
+            pointer-events: none;}
+          .disable-page.enabled .i-enabled{
+            display: block;
+            color: #01ff01;
+          }
+          .disable-page.disabled .i-disabled{
+            display: block;
+            color: #ffa4a4;
+          }
+      .page-remover{
+        position: relative;
+        top: -2px;
+        float: right;}
+
+
     </style>
 
   </head>

@@ -1,6 +1,23 @@
 var websocket;
 var websocketOk = false;
 var currendState = null;
+var api = {
+  disabledDomains: [],
+}
+
+chrome.storage.sync.get(['disabledDomains'], function(result) {
+  api = result;
+  if(typeof api.disabledDomains === 'undefined') api.disabledDomains = [];
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+    console.log('update', changes)
+    if(namespace === 'sync'){
+      for (var key in changes) {
+        api[key] = changes[key].newValue;
+      }
+    }
+  });
+  console.log('Disabled Domains', api.disabledDomains);
+});
 
 chrome.runtime.onInstalled.addListener(function(details){
     if(details.reason == "install"){
@@ -46,11 +63,11 @@ function checkActiveTab(tabId){
   clearInterval(activeInterval);
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
-    var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}];
-    requestPresence(...data);
+    var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}, () => {checkActiveTab(0);}];
     activeInterval = setInterval(function(){
       requestPresence(...data);
     }, 15000);
+    requestPresence(...data);
   }else if(passiveTab.size){
     if(passiveTab.has(tabId)){
       var temp = passiveTab.get(tabId);
@@ -65,10 +82,12 @@ function checkActiveTab(tabId){
         var tab = pTabs.pop();
         console.log('Passive Found', tab);
         var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}]
-        requestPresence(...data);
         activeInterval = setInterval(function(){
           requestPresence(...data);
         }, 15000);
+        requestPresence(...data);
+      }else{
+        disconnect();
       }
 
     }
@@ -77,13 +96,24 @@ function checkActiveTab(tabId){
   }
 
   function requestPresence(tabInfo, info, removeTab, disconnectEvent = () => {}){
+    if(api.disabledDomains.includes(tabInfo.domain)){
+      console.log('Filter', tabInfo, currendState);
+      if(currendState && typeof currendState.tabInfo !== 'undefined' && tabInfo.tabId === currendState.tabInfo.tabId){
+        disconnect();
+      }
+
+      disconnectEvent();
+      return;
+    }
     chrome.runtime.sendMessage(tabInfo.extId, {tab: tabInfo.tabId, info: info}, function(response) {
       console.log('response', response);
       if(response){
         if(typeof response.clientId !== 'undefined'){
-          sendPresence(response);
+          sendPresence(response, tabInfo);
         }else{
-          disconnect();
+          if(currendState && typeof currendState.tabInfo !== 'undefined' && tabInfo.tabId === currendState.tabInfo.tabId){
+            disconnect();
+          }
           disconnectEvent();
         }
 
@@ -152,12 +182,15 @@ function sanitizePresence(pres) {
   return pres;
 }
 
-function sendPresence(pres){
+function sendPresence(pres, tapInfo){
   websocketReady()
   .then(() => {
     pres = sanitizePresence(pres);
     websocket.send(JSON.stringify(pres));
-    currendState = pres.presence;
+    currendState = {
+      presence: pres.presence,
+      tabInfo: tapInfo
+    };
     setPresenceIcon();
   })
 }
@@ -198,11 +231,13 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   console.log('Register', request, sender);
   if(request.mode == 'passive'){
     passiveTab.set(sender.tab.id, {
+      domain: getDomain(sender.url),
       extId: sender.id,
       tabId: sender.tab.id
     });
   }else{
     activeTab[sender.tab.id] = {
+      domain: getDomain(sender.url),
       extId: sender.id,
       tabId: sender.tab.id
     };
@@ -212,12 +247,18 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   if(sender.tab.active){
     checkActiveTab(sender.tab.id);
   }
+
+  function getDomain(url){
+    url = url.split('/')[2];
+    url = url.replace(/www.?\./i, '');
+    return url;
+  }
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   sendResponse({
     websocket: websocketOk,
-    presence: currendState
+    state: currendState
   })
 });
 
