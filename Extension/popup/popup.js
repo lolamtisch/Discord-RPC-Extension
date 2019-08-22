@@ -41,13 +41,9 @@ function fillUi(){
       if(typeof presence.state !== 'undefined') state = '<div>'+presence.state+'</div>';
 
       var html = `
-        <div><b>Playing A Game</b></div>
-        ${details}
-        ${state}
-        ${time}
-        <div class="page-config">
-          ${blackHtml}
-          <button class="disable-page ${(api.disabledDomains.includes(domain)) ? 'disabled' : 'enabled'}" data-domain="${domain}" title="${domain}">
+        <div>
+          <b>Playing A Game</b>
+          <button class="page-remover disable-page ${(api.disabledDomains.includes(domain)) ? 'disabled' : 'enabled'}" data-domain="${domain}" title="${domain}">
             <img src="https://www.google.com/s2/favicons?domain=${domain}">
             <i class="i-disabled material-icons">
               not_interested
@@ -56,6 +52,12 @@ function fillUi(){
               panorama_fish_eye
             </i>
           </button>
+        </div>
+        ${details}
+        ${state}
+        ${time}
+        <div class="page-config">
+          ${blackHtml}
         </div>
       `;
     }else{
