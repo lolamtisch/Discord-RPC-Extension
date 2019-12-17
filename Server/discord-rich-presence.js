@@ -21,7 +21,7 @@ function makeClient(clientId) {
       }
     }
 
-    clearPresence(d) {
+    clearPresence() {
       if (connected) {
         rpc.clearActivity().catch((e) => this.emit('error', e));
       } else {
