@@ -6,6 +6,8 @@ var clients = {};
 
 var timeout;
 
+var ws;
+
 function resetTimeout(){
   clearTimeout(timeout);
   timeout = setTimeout(() => {
@@ -26,9 +28,16 @@ function disconnect(){
 }
 
 module.exports = {
+  init: function(websocket) {
+    ws = websocket;
+  },
   connect: function(clientId) {
     if(!clients[clientId]) {
       clients[clientId] = discordRpc(clientId);
+      clients[clientId].on('join', (secret) => {
+        console.log('Join', clientId, secret);
+        ws.send(JSON.stringify({action: 'join', 'clientId': clientId, 'secret': secret}));
+      })
     }
     return clients[clientId];
   },

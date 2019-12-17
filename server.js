@@ -32,6 +32,7 @@ wss.on('connection', function connection(ws) {
     }
   });
   ws.send(JSON.stringify({version: version}));
+  discord.init(ws);
 });
 
 console.log('WebSocket created');
