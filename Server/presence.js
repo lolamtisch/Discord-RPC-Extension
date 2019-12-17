@@ -1,4 +1,4 @@
-const discordRpc = require('discord-rich-presence')
+const discordRpc = require('./discord-rich-presence')
 
 var currentId = 0;
 
