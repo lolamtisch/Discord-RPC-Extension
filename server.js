@@ -26,6 +26,11 @@ wss.on('connection', function connection(ws) {
         case 'disconnect':
           discord.disconnect();
           break;
+        case 'party':
+          data.listener.forEach((el) => {
+            discord.connect(el.clientId, el.extId);
+          });
+          break;
       }
     }else{
       discord.send(data.clientId, data.presence, data.extId);

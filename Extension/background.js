@@ -45,6 +45,7 @@ async function websocketReady(){
       resolve();
       websocketOk = true;
       setPresenceIcon();
+      updatePartyListener();
     };
     websocket.onmessage = function (evt) {
       var data = JSON.parse(evt.data);
@@ -223,6 +224,17 @@ function disconnect(){
     });
 }
 
+var partyListener = {};
+function updatePartyListener(){
+  var listener = Object.values(partyListener);
+  if(listener.length) {
+    console.error(listener);
+    websocket.send(JSON.stringify({action: 'party', listener: listener}));
+  }else{
+    console.log('No listener to send')
+  }
+}
+
 chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
   clearTimeout(focusTimeout);
   console.log('Window Changed', activeWindowId);
@@ -247,31 +259,50 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 });
 
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
-  console.log('Register', request, sender);
-  if(request.mode == 'passive'){
-    passiveTab.set(sender.tab.id, {
-      domain: getDomain(sender.url),
-      extId: sender.id,
-      tabId: sender.tab.id
-    });
+  if(typeof request.mode !== 'undefined') {
+    console.log('Register', request, sender);
+    if(request.mode == 'passive'){
+      passiveTab.set(sender.tab.id, {
+        domain: getDomain(sender.url),
+        extId: sender.id,
+        tabId: sender.tab.id
+      });
+    }else{
+      activeTab[sender.tab.id] = {
+        domain: getDomain(sender.url),
+        extId: sender.id,
+        tabId: sender.tab.id
+      };
+    }
+
+    sendResponse({status: true});
+    if(sender.tab.active){
+      checkActiveTab(sender.tab.id);
+    }
+
+    function getDomain(url){
+      url = url.split('/')[2];
+      url = url.replace(/www.?\./i, '');
+      return url;
+    }
+  }else if(typeof request.action !== 'undefined') {
+    switch (request.action) {
+      case "party":
+        console.log('party', request);
+        partyListener[request.clientId] = {
+          clientId: request.clientId,
+          extId: sender.id,
+        }
+        updatePartyListener();
+        break;
+      default:
+        console.error('Unknown runtime action', request, sender);
+        break;
+    }
   }else{
-    activeTab[sender.tab.id] = {
-      domain: getDomain(sender.url),
-      extId: sender.id,
-      tabId: sender.tab.id
-    };
+    console.error('Unknown runtime message', request, sender);
   }
 
-  sendResponse({status: true});
-  if(sender.tab.active){
-    checkActiveTab(sender.tab.id);
-  }
-
-  function getDomain(url){
-    url = url.split('/')[2];
-    url = url.replace(/www.?\./i, '');
-    return url;
-  }
 });
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
