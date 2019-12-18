@@ -41,6 +41,17 @@ module.exports = {
         console.log('Join', clientId, secret);
         ws.send(JSON.stringify({action: 'join', 'clientId': clientId, 'extId': extId, 'secret': secret}));
       })
+
+      clients[clientId].client.on('spectate', (secret) => {
+        console.log('spectate', clientId, secret);
+        ws.send(JSON.stringify({action: 'spectate', 'clientId': clientId, 'extId': extId, 'secret': secret}));
+      })
+
+      clients[clientId].client.on('joinRequest', (user) => {
+        console.log('joinRequest', clientId, user);
+        ws.send(JSON.stringify({action: 'joinRequest', 'clientId': clientId, 'extId': extId, 'user': user}));
+      })
+
     }
     return clients[clientId].client;
   },
