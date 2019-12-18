@@ -47,7 +47,25 @@ async function websocketReady(){
       setPresenceIcon();
     };
     websocket.onmessage = function (evt) {
-      console.log("Connected", JSON.parse(evt.data));
+      var data = JSON.parse(evt.data);
+      if(typeof data.version !== 'undefined'){
+        console.log("Server", data.version);
+      }else if(typeof data.action !== 'undefined'){
+        switch (data.action) {
+          case "join":
+            console.log('join', data);
+            chrome.runtime.sendMessage(data.extId, {action: 'join', clientId: data.clientId, secret: data.secret}, function(response) {
+              console.log('join redirected', response);
+            });
+            break;
+          default:
+            console.error('Unknown action', data);
+            break;
+        }
+      }else{
+        console.error('Unknown message', data);
+      }
+
     };
   })
 }
@@ -105,7 +123,7 @@ function checkActiveTab(tabId){
       disconnectEvent();
       return;
     }
-    chrome.runtime.sendMessage(tabInfo.extId, {tab: tabInfo.tabId, info: info}, function(response) {
+    chrome.runtime.sendMessage(tabInfo.extId, {action: 'presence', tab: tabInfo.tabId, info: info}, function(response) {
       console.log('response', response);
       if(response){
         if(typeof response.clientId !== 'undefined'){
