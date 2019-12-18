@@ -186,6 +186,7 @@ function sendPresence(pres, tapInfo){
   websocketReady()
   .then(() => {
     pres = sanitizePresence(pres);
+    pres.extId = tapInfo.extId;
     websocket.send(JSON.stringify(pres));
     currendState = {
       presence: pres.presence,

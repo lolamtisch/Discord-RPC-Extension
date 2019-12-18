@@ -31,18 +31,21 @@ module.exports = {
   init: function(websocket) {
     ws = websocket;
   },
-  connect: function(clientId) {
+  connect: function(clientId, extId = null) {
     if(!clients[clientId]) {
-      clients[clientId] = discordRpc(clientId);
-      clients[clientId].on('join', (secret) => {
+      clients[clientId] = {};
+      clients[clientId].clientId = clientId;
+      clients[clientId].extId = extId;
+      clients[clientId].client = discordRpc(clientId);
+      clients[clientId].client.on('join', (secret) => {
         console.log('Join', clientId, secret);
-        ws.send(JSON.stringify({action: 'join', 'clientId': clientId, 'secret': secret}));
+        ws.send(JSON.stringify({action: 'join', 'clientId': clientId, 'extId': extId, 'secret': secret}));
       })
     }
-    return clients[clientId];
+    return clients[clientId].client;
   },
-  send: function(clientId, presence){
-    var client = module.exports.connect(clientId);
+  send: function(clientId, presence, extId = null){
+    var client = module.exports.connect(clientId, extId);
 
     if(currentId && currentId !== clientId) {
       disconnect();

@@ -28,7 +28,7 @@ wss.on('connection', function connection(ws) {
           break;
       }
     }else{
-      discord.send(data.clientId, data.presence);
+      discord.send(data.clientId, data.presence, data.extId);
     }
   });
   ws.send(JSON.stringify({version: version}));
