@@ -11,7 +11,7 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
     });
   }else if(request.action == "join"){
     //Game launch request.
-    chrome.tabs.create({url: 'https://www.twitch.tv/'+request.secret}, function (tab) {
+    chrome.tabs.create({url: 'https://www.twitch.tv'+request.secret}, function (tab) {
     });
   }
   return true;

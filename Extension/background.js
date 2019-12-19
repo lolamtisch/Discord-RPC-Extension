@@ -248,7 +248,7 @@ chrome.windows.onFocusChanged.addListener(function(activeWindowId) {
     focusTimeout = setTimeout(() => {
       console.log('Focus Timeout');
       checkActiveTab(0);
-    }, 5000);
+    }, (60 * 1000));
   }
 });
 
