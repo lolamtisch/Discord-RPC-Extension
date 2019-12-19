@@ -40,7 +40,7 @@ function makeClient(clientId) {
           rpc.closeJoinRequest(user).catch(handle);
           break;
         default:
-          throw new RangeError('unknown response');
+          console.error('unknown response');
       }
     }
 

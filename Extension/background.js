@@ -59,6 +59,18 @@ async function websocketReady(){
               console.log('join redirected', response);
             });
             break;
+          case "joinRequest":
+            console.log('joinRequest', data);
+            chrome.runtime.sendMessage(data.extId, {action: 'joinRequest', clientId: data.clientId, user: data.user, tab: currendState.tabInfo.tabId}, function(replyResponse) {
+              console.log('joinRequest response', replyResponse);
+              websocket.send(JSON.stringify({
+                action: 'reply',
+                user: data.user,
+                clientId: data.clientId,
+                response: replyResponse
+              }));
+            });
+            break;
           default:
             console.error('Unknown action', data);
             break;

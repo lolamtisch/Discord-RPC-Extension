@@ -31,6 +31,9 @@ wss.on('connection', function connection(ws) {
             discord.connect(el.clientId, el.extId);
           });
           break;
+        case 'reply':
+          discord.reply(data.user, data.clientId, data.response);
+          break;
       }
     }else{
       discord.send(data.clientId, data.presence, data.extId);

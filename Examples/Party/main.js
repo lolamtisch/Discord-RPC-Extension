@@ -10,8 +10,19 @@ chrome.runtime.sendMessage(extensionId, {mode: 'active'}, function(response) {
 
 // Wait for presence Requests
 chrome.runtime.onMessage.addListener(function(info, sender, sendResponse) {
-  console.log('Presence requested', info);
-  sendResponse(getPresence());
+  if(info.action === 'joinRequest') {
+    // If request is a joinRequest then show confirm and send response
+    console.log('Join Requests', info);
+    if (confirm(info.user.username+'#'+info.user.discriminator+' wants to join you')) {
+      sendResponse('YES');
+    } else {
+      sendResponse('NO');
+    }
+  }else{
+    console.log('Presence requested', info);
+    sendResponse(getPresence());
+  }
+
 });
 
 // Return Presence

@@ -4,14 +4,18 @@ if(typeof browser !== 'undefined' && typeof chrome !== "undefined"){
 }
 
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
-  if(typeof request.action === 'undefined' || request.action == "presence") {
+  if(request.action == "presence") {
     //Pass request to content script.
-    chrome.tabs.sendMessage(request.tab, request.info, function(response){
+    chrome.tabs.sendMessage(request.tab, {action: 'presence', info: request.info}, function(response){
       sendResponse(response);
     });
   }else if(request.action == "join"){
     //Game launch request.
     chrome.tabs.create({url: 'https://www.twitch.tv'+request.secret}, function (tab) {
+    });
+  }else if(request.action == "joinRequest"){
+    chrome.tabs.sendMessage(request.tab, {action: 'joinRequest', user: request.user}, function(response){
+      sendResponse(response);
     });
   }
   return true;

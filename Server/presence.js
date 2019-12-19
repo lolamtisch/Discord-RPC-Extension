@@ -64,9 +64,9 @@ module.exports = {
         ws.send(JSON.stringify({action: 'spectate', 'clientId': clientId, 'extId': extId, 'secret': secret}));
       })
 
-      clients[clientId].client.on('joinRequest', (user) => {
-        console.log('[Discord] JoinRequest', clientId, user);
-        ws.send(JSON.stringify({action: 'joinRequest', 'clientId': clientId, 'extId': extId, 'user': user}));
+      clients[clientId].client.on('joinRequest', (res) => {
+        console.log('[Discord] JoinRequest', clientId, res);
+        ws.send(JSON.stringify({action: 'joinRequest', 'clientId': clientId, 'extId': extId, 'user': res.user}));
       })
 
     }
@@ -88,6 +88,13 @@ module.exports = {
     resetTimeout();
   },
   disconnect: disconnect,
+  reply: function(user, clientId, response){
+    console.log('[Discord] reply', user, clientId, response);
+    var replyClient = module.exports.connect(clientId);
+    if(typeof replyClient !== 'undefined'){
+      replyClient.reply(user, response);
+    }
+  },
 }
 
 var discordCheckInterval;
