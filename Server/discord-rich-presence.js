@@ -51,6 +51,8 @@ function makeClient(clientId) {
 
   rpc.on('error', (e) => instance.emit('error', e));
 
+  rpc.on('disconnected', (e) => instance.emit('disconnected', e));
+
   rpc.login({ clientId })
     .then(() => {
       instance.emit('connected');

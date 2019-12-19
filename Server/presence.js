@@ -32,23 +32,35 @@ module.exports = {
     ws = websocket;
   },
   connect: function(clientId, extId = null) {
-    if(!clients[clientId]) {
+    if((!clients[clientId] || (clients[clientId] && clients[clientId].state == 'disconnected' )) && extId) {
+      console.error('[Discord] Login', clientId, extId);
       clients[clientId] = {};
       clients[clientId].clientId = clientId;
       clients[clientId].extId = extId;
+      clients[clientId].state = 'waiting';
       clients[clientId].client = discordRpc(clientId);
+      clients[clientId].client.on('connected', (e) => {
+        clients[clientId].state = 'connected';
+        console.log('[Discord] Connected', clientId, extId);
+        discordFound();
+      });
+      clients[clientId].client.on('disconnected', (e) => {
+        clients[clientId].state = 'disconnected';
+        console.error('[Discord] Disconnected', clientId, extId);
+        noDiscord();
+      });
       clients[clientId].client.on('join', (secret) => {
-        console.log('Join', clientId, secret);
+        console.log('[Discord] Join', clientId, secret);
         ws.send(JSON.stringify({action: 'join', 'clientId': clientId, 'extId': extId, 'secret': secret}));
       })
 
       clients[clientId].client.on('spectate', (secret) => {
-        console.log('spectate', clientId, secret);
+        console.log('[Discord] Spectate', clientId, secret);
         ws.send(JSON.stringify({action: 'spectate', 'clientId': clientId, 'extId': extId, 'secret': secret}));
       })
 
       clients[clientId].client.on('joinRequest', (user) => {
-        console.log('joinRequest', clientId, user);
+        console.log('[Discord] JoinRequest', clientId, user);
         ws.send(JSON.stringify({action: 'joinRequest', 'clientId': clientId, 'extId': extId, 'user': user}));
       })
 
@@ -71,4 +83,37 @@ module.exports = {
     resetTimeout();
   },
   disconnect: disconnect,
+}
+
+var discordCheckInterval;
+
+function noDiscord() {
+  clearInterval(discordCheckInterval);
+
+  discordCheckInterval = setInterval(() => {
+    console.log('[Discord] Trying to reconnect');
+
+    var disconnects = Object.values(clients).filter(function(el) {
+      return el.state === 'disconnected';
+    });
+    var el = disconnects[Math.floor(Math.random()*disconnects.length)];
+
+
+    module.exports.connect(el.clientId, el.extId);
+  }, (30 * 1000));
+}
+
+function discordFound() {
+  clearInterval(discordCheckInterval);
+
+  var disconnects = Object.values(clients).filter(function(el) {
+    return el.state === 'disconnected';
+  });
+
+  if(disconnects.length) {
+    console.log('[Discord] Reconnection all clients', disconnects.length);
+    disconnects.forEach((el) => {
+      module.exports.connect(el.clientId, el.extId);
+    });
+  }
 }
