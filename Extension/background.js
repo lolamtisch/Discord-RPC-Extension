@@ -22,7 +22,7 @@ chrome.storage.sync.get(['disabledDomains'], function(result) {
 chrome.runtime.onInstalled.addListener(function(details){
     if(details.reason == "install"){
       chrome.tabs.create({url: chrome.extension.getURL('installPage/install.html')}, function (tab) {
-        con.info("Open installPage");
+        console.info("Open installPage");
       });
     }else if(details.reason == "update"){
     }
@@ -228,7 +228,6 @@ var partyListener = {};
 function updatePartyListener(){
   var listener = Object.values(partyListener);
   if(listener.length) {
-    console.error(listener);
     websocket.send(JSON.stringify({action: 'party', listener: listener}));
   }else{
     console.log('No listener to send')
