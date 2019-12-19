@@ -49,6 +49,11 @@ module.exports = {
         console.error('[Discord] Disconnected', clientId, extId);
         noDiscord();
       });
+      clients[clientId].client.on('error', (e) => {
+        console.error('[Discord] Error', clientId, extId, e);
+        clients[clientId].state = 'disconnected';
+        noDiscord();
+      });
       clients[clientId].client.on('join', (secret) => {
         console.log('[Discord] Join', clientId, secret);
         ws.send(JSON.stringify({action: 'join', 'clientId': clientId, 'extId': extId, 'secret': secret}));
@@ -96,10 +101,13 @@ function noDiscord() {
     var disconnects = Object.values(clients).filter(function(el) {
       return el.state === 'disconnected';
     });
-    var el = disconnects[Math.floor(Math.random()*disconnects.length)];
+    if(disconnects.length) {
+      var el = disconnects[Math.floor(Math.random()*disconnects.length)];
+      module.exports.connect(el.clientId, el.extId);
+    }else{
+      clearInterval(discordCheckInterval);
+    }
 
-
-    module.exports.connect(el.clientId, el.extId);
   }, (30 * 1000));
 }
 
