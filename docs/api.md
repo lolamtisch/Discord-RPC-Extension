@@ -10,9 +10,9 @@ chrome.runtime.sendMessage(extensionId, {mode: 'active'}, function(response) {
 ```
 The registration is only needed to be executed once for the extension to know that the presence exists. The presence is requested every 15 seconds, but if some change happens the presence can be forced to update through calling the registration again.
 ### Modes
-There are 2 different presence types can be registered. You have to pass it during the registration.
+There are 2 different presence types that can be registered. You have to pass it during the registration.
 #### active
-Use this mode if the presence is only important if the script is in the currently focused tab. 
+Use this mode if the presence is only important if the script is in the currently focused tab.
 
 #### passive
 In this mode the presence is displayed even if the Tab is not focused (Example: music player). Active mode presences always have priority over the passive presences. If you need to handle the presence different when the tab is in focus or not. The presence listener passes if the tab is in focus.
@@ -43,9 +43,11 @@ The listener has always to return a presence, if it only misses one request it g
 ## Background Page
 ```JS
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
-  chrome.tabs.sendMessage(request.tab, request.info, function(response){
-    sendResponse(response);
-  });
+  if(request.action == "presence") {
+    chrome.tabs.sendMessage(request.tab, request.info, function(response){
+      sendResponse(response);
+    });
+  }
   return true;
 });
 ```
