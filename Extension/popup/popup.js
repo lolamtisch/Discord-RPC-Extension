@@ -23,8 +23,14 @@ function fillUi(){
       `;
     }
 
+    var html = '';
+
+    if(!presence.clientIsUpToDate) {
+      html += '<div><b style="color: red; background-color: white; display: block; padding: 10px; margin-bottom: 10px;">Desktop client is not up to date. Please download the <a href="https://github.com/lolamtisch/Discord-RPC-Extension/releases/latest" style="color: red;" target="_blank">latest version</a>.</b></div>';
+    }
+
     if(!presence.websocket){
-      var html = '<div><b>No active connection to the server</b></div>';
+      html += '<div><b>No active connection to the server</b></div>';
     }else if(typeof presence.state !== 'undefined' && presence.state){
       presence = presence.state.presence;
       var time = '';
@@ -40,7 +46,7 @@ function fillUi(){
       var state = '';
       if(typeof presence.state !== 'undefined') state = '<div>'+presence.state+'</div>';
 
-      var html = `
+      html += `
         <div>
           <b>Playing A Game</b>
           <button class="page-remover disable-page ${(api.disabledDomains.includes(domain)) ? 'disabled' : 'enabled'}" data-domain="${domain}" title="${domain}">
@@ -61,7 +67,7 @@ function fillUi(){
         </div>
       `;
     }else{
-      var html = `<div><b>No Presence Active</b><div class="page-config">${blackHtml}</div></div>`;
+      html += `<div><b>No Presence Active</b><div class="page-config">${blackHtml}</div></div>`;
     }
 
     document.getElementById('main').innerHTML = html;

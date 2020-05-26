@@ -1,6 +1,7 @@
 var websocket;
 var websocketOk = false;
 var currendState = null;
+var serverVersion = null;
 var api = {
   disabledDomains: [],
 }
@@ -28,6 +29,11 @@ chrome.runtime.onInstalled.addListener(function(details){
     }
 });
 
+function clientIsUpToDate() {
+  if(!serverVersion || serverVersion === '0.1.0') return true;
+  return false;
+}
+
 async function websocketReady(){
   return new Promise(function(resolve, reject){
     if(typeof websocket !== 'undefined' && websocket.readyState === 1){// Connection is fine
@@ -51,6 +57,7 @@ async function websocketReady(){
       var data = JSON.parse(evt.data);
       if(typeof data.version !== 'undefined'){
         console.log("Server", data.version);
+        serverVersion = data.version;
       }else if(typeof data.action !== 'undefined'){
         switch (data.action) {
           case "join":
@@ -319,6 +326,7 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   sendResponse({
     websocket: websocketOk,
+    clientIsUpToDate: clientIsUpToDate(),
     state: currendState
   })
 });
