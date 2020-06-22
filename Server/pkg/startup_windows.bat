@@ -7,7 +7,7 @@ if not "%1"=="am_admin" (powershell start -verb runas '%0' am_admin & exit /b)
 Set keyname=Discord RPC Extension
 
 echo	Discord-RPC-Extension
-echo    1. Add Discord-RPC-Extensionc Program to Startup
+echo    1. Add Discord-RPC-Extension Program to Startup
 echo    2. Remove Discord-RPC-Extension Program From Startup
 echo    3. Exit
 
