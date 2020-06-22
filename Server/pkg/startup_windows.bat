@@ -31,5 +31,7 @@ goto begin
 :delstartup
 cls
 reg delete HKLM\Software\Microsoft\Windows\CurrentVersion\Run\ /v "%keyname%" /f
+:: also delete old key
+reg delete HKLM\Software\Microsoft\Windows\CurrentVersion\Run\ /v "MAL Sync Program" /f
 timeout /t 2 >nul
 goto begin
