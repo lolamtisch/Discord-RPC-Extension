@@ -30,7 +30,8 @@ function fillUi(){
     }
 
     if(!presence.websocket){
-      html += '<div><b>No active connection to the server</b></div>';
+      html +=
+        '<div><b>No active connection to the server</b><br><a class="button" style="text-align: center; display: block; padding-top: 10px;" href="https://github.com/lolamtisch/Discord-RPC-Extension/releases/latest" target="_blank">Download</a></div>';
     }else if(typeof presence.state !== 'undefined' && presence.state){
       presence = presence.state.presence;
       var time = '';
