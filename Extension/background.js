@@ -313,6 +313,26 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
         }
         updatePartyListener();
         break;
+      case "state":
+        console.log('state');
+        var st = {
+          connected: false,
+          upToDate: false,
+          error: false,
+        };
+
+        st.connected = websocketOk;
+        st.upToDate = clientIsUpToDate();
+        if (!st.connected) {
+          st.error = {
+            code: 901,
+            message: 'Application is not running or is not installed',
+            url: 'https://github.com/lolamtisch/Discord-RPC-Extension/releases/latest',
+          }
+        }
+        sendResponse(st);
+        websocketReady()
+        break;
       default:
         console.error('Unknown runtime action', request, sender);
         break;
@@ -371,3 +391,4 @@ function setPresenceIcon(){
   }
 
 }
+websocketReady();
