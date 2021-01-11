@@ -1,0 +1,10 @@
+{
+  "manifest_version": 2,
+  "name": "Background script Example",
+  "version": "0.0.1",
+  "description": "",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  }
+}

@@ -94,6 +94,7 @@ chrome.storage.local.set({'presence': null});
 
 var activeTab = {};
 var passiveTab = new Map();
+var backgroundTab = {};
 var activeInterval;
 var focusTimeout;
 
@@ -106,20 +107,27 @@ function checkActiveTab(tabId){
       requestPresence(...data);
     }, 15000);
     requestPresence(...data);
-  }else if(passiveTab.size){
+  }else if(passiveTab.size || Object.keys(backgroundTab).length){
     if(passiveTab.has(tabId)){
       var temp = passiveTab.get(tabId);
       passiveTab.delete(tabId);
       passiveTab.set(tabId, temp);
     }
-    var pTabs = Array.from(passiveTab.values());
+    // Combine background and passive tab array as they are handled the same way
+    var pTabs = Object.values(backgroundTab).concat(Array.from(passiveTab.values()));
     passive();
     function passive(){
       if(pTabs.length){
         clearInterval(activeInterval);
         var tab = pTabs.pop();
         console.log('Passive Found', tab);
-        var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}]
+        // Background Page
+        if (tab.domain === tab.tabId) {
+          var data = [tab, {active: false}, () => {delete backgroundTab[tab.tabId];}, () => {passive();}]
+        } else {
+          var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}]
+        }
+
         activeInterval = setInterval(function(){
           requestPresence(...data);
         }, 15000);
@@ -279,7 +287,13 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 chrome.runtime.onMessageExternal.addListener(function(request, sender, sendResponse) {
   if(typeof request.mode !== 'undefined') {
     console.log('Register', request, sender);
-    if(request.mode == 'passive'){
+    if(!sender.tab){
+      backgroundTab[sender.id] = {
+        domain: sender.id,
+        extId: sender.id,
+        tabId: sender.id
+      }
+    }else if(request.mode == 'passive'){
       passiveTab.set(sender.tab.id, {
         domain: getDomain(sender.url),
         extId: sender.id,
@@ -294,7 +308,7 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
     }
 
     sendResponse({status: true});
-    if(sender.tab.active){
+    if(sender.tab && sender.tab.active){
       checkActiveTab(sender.tab.id);
     }
 
