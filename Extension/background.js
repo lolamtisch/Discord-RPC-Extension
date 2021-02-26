@@ -30,7 +30,7 @@ chrome.runtime.onInstalled.addListener(function(details){
 });
 
 function clientIsUpToDate() {
-  if(!serverVersion || serverVersion === '0.1.1') return true;
+  if(!serverVersion || serverVersion === '0.1.2') return true;
   return false;
 }
 
