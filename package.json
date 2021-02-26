@@ -24,7 +24,7 @@
     "build:macos": "npm run build:macos:64 && npm run build:macos:32",
     "build:macos:64": "pkg -c Server/pkg/mac.json --out-path ./dist -t node10-macos-x64 Server/linux_tray_server.js",
     "build:macos:32": "pkg -o ./dist/server_macos_no_tray_debug -t node10-macos-x64 server.js",
-    "build:pack": "node server/pkg/pack.js"
+    "build:pack": "node Server/pkg/pack.js"
   },
   "repository": {
     "type": "git",
