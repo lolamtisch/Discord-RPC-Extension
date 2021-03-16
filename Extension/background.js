@@ -225,6 +225,12 @@ function sanitizePresence(pres) {
   if (typeof pres.presence.startTimestamp !== 'undefined' && (!/^\d+$/.test(pres.presence.startTimestamp) || pres.presence.startTimestamp === "")){
     delete pres.presence.startTimestamp;
   }
+  //buttons
+  if (typeof pres.presence.buttons !== 'undefined' && pres.presence.buttons.length > 2) {
+    while (pres.presence.buttons.length > 2) {
+      pres.presence.buttons.pop();
+    }
+  }
   return pres;
 }
 
