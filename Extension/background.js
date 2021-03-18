@@ -231,6 +231,7 @@ function sanitizePresence(pres) {
       pres.presence.buttons.pop();
     }
   }
+  if (typeof pres.presence.buttons !== 'undefined' && !pres.presence.buttons.length) delete pres.presence.buttons;
   return pres;
 }
 
