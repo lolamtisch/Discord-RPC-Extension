@@ -100,6 +100,10 @@ var focusTimeout;
 
 function checkActiveTab(tabId){
   clearInterval(activeInterval);
+
+  const curTime = new Date().getTime();
+  const usingActive = Object.values(activeTab).filter(el => el.usingTime && el.usingTime > curTime - (2 * 60 * 1000));
+
   if(typeof activeTab[tabId] !== 'undefined'){
     console.log('Script Found', activeTab[tabId]);
     var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}, () => {checkActiveTab(0);}];
@@ -107,14 +111,15 @@ function checkActiveTab(tabId){
       requestPresence(...data);
     }, 15000);
     requestPresence(...data);
-  }else if(passiveTab.size || Object.keys(backgroundTab).length){
+  }else if(passiveTab.size || Object.keys(backgroundTab).length || usingActive.length){
     if(passiveTab.has(tabId)){
       var temp = passiveTab.get(tabId);
       passiveTab.delete(tabId);
       passiveTab.set(tabId, temp);
     }
-    // Combine background and passive tab array as they are handled the same way
-    var pTabs = Object.values(backgroundTab).concat(Array.from(passiveTab.values()));
+
+    // Combine background, passive tab and using active array as they are handled the same way
+    var pTabs = Object.values(backgroundTab).concat(Array.from(passiveTab.values()), usingActive);
     passive();
     function passive(){
       if(pTabs.length){
@@ -123,9 +128,9 @@ function checkActiveTab(tabId){
         console.log('Passive Found', tab);
         // Background Page
         if (tab.domain === tab.tabId) {
-          var data = [tab, {active: false}, () => {delete backgroundTab[tab.tabId];}, () => {passive();}]
+          var data = [tab, {active: false}, () => {delete backgroundTab[tab.tabId];}, () => {passive();}, true]
         } else {
-          var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}]
+          var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}, true]
         }
 
         activeInterval = setInterval(function(){
@@ -141,7 +146,7 @@ function checkActiveTab(tabId){
     disconnect();
   }
 
-  function requestPresence(tabInfo, info, removeTab, disconnectEvent = () => {}){
+  function requestPresence(tabInfo, info, removeTab, disconnectEvent = () => {}, passive = false){
     if(api.disabledDomains.includes(tabInfo.domain)){
       console.log('Filter', tabInfo, currendState);
       if(currendState && typeof currendState.tabInfo !== 'undefined' && tabInfo.tabId === currendState.tabInfo.tabId){
@@ -154,8 +159,20 @@ function checkActiveTab(tabId){
     chrome.runtime.sendMessage(tabInfo.extId, {action: 'presence', tab: tabInfo.tabId, info: info}, function(response) {
       console.log('response', response);
       if(response){
-        if(typeof response.clientId !== 'undefined'){
+        if(
+          typeof response.clientId !== 'undefined' && (
+            !passive ||
+            isUsing(response, tabInfo.type)
+          )
+        ){
           sendPresence(response, tabInfo);
+
+          if (tabInfo.type === 'active') {
+            if (isUsing(response, tabInfo.type)) {
+              activeTab[tabInfo.tabId]['usingTime'] = new Date().getTime();
+            }
+          }
+
         }else{
           if(currendState && typeof currendState.tabInfo !== 'undefined' && tabInfo.tabId === currendState.tabInfo.tabId){
             disconnect();
@@ -235,6 +252,20 @@ function sanitizePresence(pres) {
   return pres;
 }
 
+function isUsing(response, type) {
+  if (type !== 'active') {
+    return true;
+  }
+  if (
+    response.presence.smallImageKey &&
+    response.presence.smallImageText &&
+    (response.presence.smallImageKey + response.presence.smallImageText).toLowerCase().includes('play')
+  ) {
+    return true;
+  }
+  return false;
+}
+
 function sendPresence(pres, tapInfo){
   websocketReady()
   .then(() => {
@@ -296,18 +327,21 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
     console.log('Register', request, sender);
     if(!sender.tab){
       backgroundTab[sender.id] = {
+        type: 'background',
         domain: sender.id,
         extId: sender.id,
         tabId: sender.id
       }
     }else if(request.mode == 'passive'){
       passiveTab.set(sender.tab.id, {
+        type: 'passive',
         domain: getDomain(sender.url),
         extId: sender.id,
         tabId: sender.tab.id
       });
     }else{
       activeTab[sender.tab.id] = {
+        type: 'active',
         domain: getDomain(sender.url),
         extId: sender.id,
         tabId: sender.tab.id
