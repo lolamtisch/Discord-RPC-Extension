@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Product Name='Discord Rich Presence' Manufacturer='lolamtisch'
+    Id='300d8eaf-edcf-408d-94e9-4b5360ae58ab'
+    UpgradeCode='edcb456a-66cb-4041-9d17-ca8beb70ec13'
+    Language='1033' Codepage='1252' Version='0.1.2'>
+
+    <Package Id='*' Keywords='Installer' Description="Discord Rich Presence"
+      Comments='Discord Rich Presence' Manufacturer='lolamtisch'
+      InstallerVersion='100' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+
+    <Media Id='1' Cabinet='Sample.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+    <Property Id='DiskPrompt' Value="Discord Rich Presence Installation [1]" />
+
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder' Name='PFiles'>
+        <Directory Id='lolamtisch' Name='lolamtisch'>
+          <Directory Id='INSTALLDIR' Name='Discord Rich Presence'>
+            <Component Id='MainExecutable' Guid='e541f868-18b6-477b-921c-dcb4a5736757'>
+              <File Id='ServerEXE' Name='server_win_64bit.exe' DiskId='1' Source='server_win_64bit.exe' KeyPath='yes'>
+                <Shortcut Id="startmenuServer10" Directory="ProgramMenuDir" Name="Discord RPC Extension"
+                  WorkingDirectory='INSTALLDIR' Icon="logo.ico" IconIndex="0" Advertise="yes" />
+              </File>
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="Discord Rich Presence">
+          <Component Id="ProgramMenuDir" Guid="d871eb4f-1444-423b-9563-55a3763fdc35">
+            <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+            <RegistryValue Root='HKCU' Key='Software\lolamtisch\Discord Rich Presence' Type='string' Value='' KeyPath='yes' />
+          </Component>
+        </Directory>
+        <Component Id='AutoStart' Guid='c9711a96-8e6c-4f8e-8d92-bf6da204409b'>
+          <RegistryKey Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Run">
+            <RegistryValue Type="string" Name="Discord Rich Presence" Value="&quot;[#ServerEXE]&quot;" KeyPath='yes'/>
+          </RegistryKey>
+        </Component>
+      </Directory>
+
+    </Directory>
+
+    <Feature Id='Complete' Level='1'>
+      <ComponentRef Id='MainExecutable' />
+      <ComponentRef Id='ProgramMenuDir' />
+      <ComponentRef Id='AutoStart' />
+    </Feature>
+
+    <CustomAction Id='LaunchFile' FileKey='ServerEXE' ExeCommand='' Return='asyncNoWait' />
+
+    <UI Id="UserInterface">
+      <Property Id="WIXUI_INSTALLDIR" Value="TARGETDIR" />
+      <Property Id="WixUI_Mode" Value="Custom" />
+
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="9" Bold="yes" />
+      <TextStyle Id="WixUI_Font_Title"  FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="UserExit" />
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="EndDialog" Value="Return" Order="2"></Publish>
+
+      <Publish Dialog="ExitDialog"
+        Control="Finish"
+        Event="DoAction"
+        Value="LaunchFile">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+    </UI>
+    <UIRef Id="WixUI_Common" />
+
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch Application"/>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1"/>
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value="The Application will be started by default on boot. You can disable it in the Task-Manager Autostart section" />
+
+    <Icon Id="logo.ico" SourceFile="logo.ico" />
+
+  </Product>
+</Wix>

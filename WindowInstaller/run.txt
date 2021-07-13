@@ -1,0 +1,19 @@
+1. Change Icon and metadata with resource hacker in %user%/.pkg-cache
+
+	{
+		VALUE "CompanyName", "lolamtisch"
+		VALUE "ProductName", "Discord Rich Presence"
+		VALUE "FileDescription", "Discord Rich Presence"
+		VALUE "FileVersion", "0.1.2"
+		VALUE "ProductVersion", "0.1.2"
+		VALUE "OriginalFilename", "node.exe"
+		VALUE "InternalName", "Discord Rich Presence"
+		VALUE "LegalCopyright", "lolamtisch"
+	}
+
+2. Compile server and copy into this folder
+
+
+3. Build msi with WiX Toolset
+"C:\Program Files (x86)\WiX Toolset v3.11\bin\candle.exe" "Discord Rich Presence.xws"
+"C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" -ext WixUIExtension "Discord Rich Presence.wixobj"
