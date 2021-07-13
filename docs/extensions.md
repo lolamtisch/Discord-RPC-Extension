@@ -25,3 +25,9 @@ Integrates MyAnimeList into various sites, with auto episode tracking. Supports 
 Presence for Google Stadia.
 
 [Chrome](https://chrome.google.com/webstore/detail/stadiarpc/dmhhgpkmilabgjpdbkinimkihdiobljg) | [Github](https://github.com/soap-less/StadiaRPC)
+
+## Stadia Enhanced
+
+Presence for Google Stadia.
+
+[Chrome](https://chrome.google.com/webstore/detail/stadia-enhanced/ldeakaihfnkjmelifgmbmjlphdfncbfg) | [Github](https://github.com/ChristopherKlay/StadiaEnhanced)
