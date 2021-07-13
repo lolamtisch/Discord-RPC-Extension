@@ -20,12 +20,6 @@ Integrates MyAnimeList into various sites, with auto episode tracking. Supports 
 
 [Chrome](https://chrome.google.com/webstore/detail/mal-sync/kekjfbackdeiabghhcdklcdoekaanoel) | [Firefox](https://addons.mozilla.org/en-US/firefox/addon/mal-sync/) | [Github](https://github.com/MALSync/MALSync)
 
-## StadiaRPC
-
-Presence for Google Stadia.
-
-[Chrome](https://chrome.google.com/webstore/detail/stadiarpc/dmhhgpkmilabgjpdbkinimkihdiobljg) | [Github](https://github.com/soap-less/StadiaRPC)
-
 ## Stadia Enhanced
 
 Presence for Google Stadia.
