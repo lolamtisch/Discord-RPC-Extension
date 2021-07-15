@@ -99,7 +99,11 @@ var activeInterval;
 var focusTimeout;
 
 function checkActiveTab(tabId){
-  clearInterval(activeInterval);
+  console.log('check', tabId);
+  if(tabId !== 0) {
+    clearInterval(activeInterval);
+    activeInterval = undefined;
+  }
 
   const curTime = new Date().getTime();
   const usingActive = Object.values(activeTab).filter(el => el.usingTime && el.usingTime > curTime - (2 * 60 * 1000));
@@ -123,7 +127,10 @@ function checkActiveTab(tabId){
     passive();
     function passive(){
       if(pTabs.length){
-        clearInterval(activeInterval);
+        if(tabId !== 0) {
+          clearInterval(activeInterval);
+          activeInterval = undefined;
+        }
         var tab = pTabs.pop();
         console.log('Passive Found', tab);
         // Background Page
@@ -133,9 +140,11 @@ function checkActiveTab(tabId){
           var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}, true]
         }
 
-        activeInterval = setInterval(function(){
-          requestPresence(...data);
-        }, 15000);
+        if (typeof activeInterval === 'undefined') {
+          activeInterval = setInterval(function(){
+            requestPresence(...data);
+          }, 15000);
+        }
         requestPresence(...data);
       }else{
         disconnect();
@@ -185,6 +194,7 @@ function checkActiveTab(tabId){
         console.log('Unregister Presence', tabId);
         removeTab();
         clearInterval(activeInterval);
+        activeInterval = undefined;
         disconnect();
         checkActiveTab(tabId);
       }
