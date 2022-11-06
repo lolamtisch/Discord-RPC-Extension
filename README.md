@@ -8,7 +8,8 @@ Discord rich presence extension with open API.
 
 ## Important!
 This extension only works in combination with the desktop application.  
-[Download Here](https://github.com/lolamtisch/Discord-RPC-Extension/releases/latest)
+[Download Here](https://github.com/lolamtisch/Discord-RPC-Extension/releases/latest)  
+[Scoop](https://scoop.sh/#/apps?q=discord-rpc-extension&s=0&d=1&o=true)
 
 This extension does not contain any presences.
 They are added by other extensions that communicate with this extension.
