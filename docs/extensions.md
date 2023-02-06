@@ -19,9 +19,3 @@ Presence pack for Youtube, Twitch and Soundcloud.
 Integrates MyAnimeList into various sites, with auto episode tracking. Supports Rich Presence.
 
 [Chrome](https://chrome.google.com/webstore/detail/mal-sync/kekjfbackdeiabghhcdklcdoekaanoel) | [Firefox](https://addons.mozilla.org/en-US/firefox/addon/mal-sync/) | [Github](https://github.com/MALSync/MALSync)
-
-## Stadia Enhanced
-
-Presence for Google Stadia.
-
-[Chrome](https://chrome.google.com/webstore/detail/stadia-enhanced/ldeakaihfnkjmelifgmbmjlphdfncbfg) | [Github](https://github.com/ChristopherKlay/StadiaEnhanced)
