@@ -8,12 +8,6 @@ PreMiD Presences wrapper with over 500 presences.
 
 [Chrome](https://chrome.google.com/webstore/detail/prewrap/calpcokkjmookodfpbmdbknfcjhekgaj) | [Firefox](https://addons.mozilla.org/firefox/addon/prewrap/) | [Github](https://github.com/lolamtisch/PreWrap)
 
-## Discord-RPC-Pack
-
-Presence pack for Youtube, Twitch and Soundcloud.
-
-[Chrome](https://chrome.google.com/webstore/detail/discord-rpc-pack/bdeelgdodbhgcablahbafehccghhpimj) | [Firefox](https://addons.mozilla.org/firefox/addon/discord-rpc-pack/) | [Github](https://github.com/lolamtisch/Discord-RPC-Pack)
-
 ## MAL-Sync
 
 Integrates MyAnimeList into various sites, with auto episode tracking. Supports Rich Presence.
