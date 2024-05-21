@@ -4,6 +4,7 @@
   "version": "0.1.6",
   "description": "Discord rich presence extension with open API.",
   "background": {
+    "scripts": ["background.js"],
     "service_worker": "background.js"
   },
   "icons": {
@@ -16,6 +17,9 @@
   "action": {
     "default_icon": "icons/icon16.png",
     "default_popup": "popup/popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
   },
   "permissions": ["tabs", "storage"]
 }
