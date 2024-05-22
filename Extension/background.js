@@ -22,7 +22,7 @@ chrome.storage.sync.get(['disabledDomains'], function(result) {
 
 chrome.runtime.onInstalled.addListener(function(details){
     if(details.reason == "install"){
-      chrome.tabs.create({url: chrome.extension.getURL('installPage/install.html')}, function (tab) {
+      chrome.tabs.create({url: chrome.runtime.getURL('installPage/install.html')}, function (tab) {
         console.info("Open installPage");
       });
     }else if(details.reason == "update"){
@@ -416,15 +416,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   })
 });
 
-var img = new Image();
-img.src = chrome.extension.getURL('icons/icon16.png');
-function setPresenceIcon(){
+async function setPresenceIcon(){
   if(currendState || !websocketOk){
-    var canvas = document.createElement('canvas');
+    var canvas = typeof document !== 'undefined'
+      ? document.createElement("canvas")
+      : new OffscreenCanvas(19, 19);
     canvas.width = 19;
     canvas.height = 19;
 
     var context = canvas.getContext('2d');
+
+    const imgblob = await fetch(chrome.runtime.getURL('icons/icon16.png')).then(r => r.blob());
+    const img = await createImageBitmap(imgblob);
 
     context.drawImage(img, 0, 0, 19, 19);
 
@@ -446,11 +449,11 @@ function setPresenceIcon(){
 
     context.stroke();
 
-    chrome.browserAction.setIcon({
+    chrome.action.setIcon({
       imageData: context.getImageData(0, 0, 19, 19)
     });
   }else{
-    chrome.browserAction.setIcon({
+    chrome.action.setIcon({
       path: "icons/icon16.png"
     });
   }
