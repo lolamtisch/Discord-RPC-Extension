@@ -92,9 +92,60 @@ async function websocketReady(){
 
 chrome.storage.local.set({'presence': null});
 
-var activeTab = {};
-var passiveTab = new Map();
-var backgroundTab = {};
+const activeTab = {
+  status: {},
+  get(tabId) {
+    return this.status[tabId]
+  },
+  getAll(){
+    return this.status
+  },
+  set(tabId, content) {
+    this.status[tabId] = content
+  },
+  delete(tabId) {
+    delete this.status[tabId]
+  }
+};
+
+const passiveTab = {
+  status: new Map(),
+  get(tabId) {
+    return this.status.get(tabId);
+  },
+  set(tabId, content) {
+    return this.status.set(tabId, content);
+  },
+  has(tabId) {
+    return this.status.has(tabId);
+  },
+  values() {
+    return this.status.values();
+  },
+  delete(tabId) {
+    return this.status.delete(tabId);
+  },
+  size() {
+    return this.status.size;
+  }
+};
+
+const backgroundTab = {
+  status: {},
+  get(tabId) {
+    return this.status[tabId];
+  },
+  getAll() {
+    return this.status;
+  },
+  set(tabId, content) {
+    this.status[tabId] = content;
+  },
+  delete(tabId) {
+    delete this.status[tabId];
+  },
+};
+
 var activeInterval;
 var focusTimeout;
 
@@ -106,16 +157,16 @@ function checkActiveTab(tabId){
   }
 
   const curTime = new Date().getTime();
-  const usingActive = Object.values(activeTab).filter(el => el.usingTime && el.usingTime > curTime - (2 * 60 * 1000));
+  const usingActive = Object.values(activeTab.getAll()).filter(el => el.usingTime && el.usingTime > curTime - (2 * 60 * 1000));
 
-  if(typeof activeTab[tabId] !== 'undefined'){
-    console.log('Script Found', activeTab[tabId]);
-    var data = [activeTab[tabId], {active: true}, () => {delete activeTab[tabId];}, () => {checkActiveTab(0);}];
+  if(typeof activeTab.get(tabId) !== 'undefined'){
+    console.log('Script Found', activeTab.get(tabId));
+    var data = [activeTab.get(tabId), {active: true}, () => {activeTab.delete(tabId);}, () => {checkActiveTab(0);}];
     activeInterval = setInterval(function(){
       requestPresence(...data);
     }, 15000);
     requestPresence(...data);
-  }else if(passiveTab.size || Object.keys(backgroundTab).length || usingActive.length){
+  }else if(passiveTab.size() || Object.keys(backgroundTab.values()).length || usingActive.length){
     if(passiveTab.has(tabId)){
       var temp = passiveTab.get(tabId);
       passiveTab.delete(tabId);
@@ -123,7 +174,10 @@ function checkActiveTab(tabId){
     }
 
     // Combine background, passive tab and using active array as they are handled the same way
-    var pTabs = Object.values(backgroundTab).concat(Array.from(passiveTab.values()), usingActive);
+    var pTabs = Object.values(backgroundTab.values()).concat(
+      Array.from(passiveTab.values()),
+      usingActive
+    );
     passive();
     function passive(){
       if(pTabs.length){
@@ -135,7 +189,7 @@ function checkActiveTab(tabId){
         console.log('Passive Found', tab);
         // Background Page
         if (tab.domain === tab.tabId) {
-          var data = [tab, {active: false}, () => {delete backgroundTab[tab.tabId];}, () => {passive();}, true]
+          var data = [tab, {active: false}, () => {backgroundTab.delete([tab.tabId]);}, () => {passive();}, true]
         } else {
           var data = [tab, {active: (tab.tabId === tabId)}, () => {passiveTab.delete(tab.tabId);}, () => {passive();}, true]
         }
@@ -178,7 +232,7 @@ function checkActiveTab(tabId){
 
           if (tabInfo.type === 'active') {
             if (isUsing(response, tabInfo.type)) {
-              activeTab[tabInfo.tabId]['usingTime'] = new Date().getTime();
+              activeTab.get(tabInfo.tabId)['usingTime'] = new Date().getTime();
             }
           }
 
@@ -339,12 +393,12 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
   if(typeof request.mode !== 'undefined') {
     console.log('Register', request, sender);
     if(!sender.tab){
-      backgroundTab[sender.id] = {
+      backgroundTab.set(sender.id, {
         type: 'background',
         domain: sender.id,
         extId: sender.id,
         tabId: sender.id
-      }
+      });
     }else if(request.mode == 'passive'){
       passiveTab.set(sender.tab.id, {
         type: 'passive',
@@ -353,12 +407,12 @@ chrome.runtime.onMessageExternal.addListener(function(request, sender, sendRespo
         tabId: sender.tab.id
       });
     }else{
-      activeTab[sender.tab.id] = {
+      activeTab.set(sender.tab.id, {
         type: 'active',
         domain: getDomain(sender.url),
         extId: sender.id,
         tabId: sender.tab.id
-      };
+      });
     }
 
     sendResponse({status: true});
