@@ -157,6 +157,7 @@ function insertTabInfo(object, data) {
     if (Object.prototype.hasOwnProperty.call(data, el)) {
       const element = data[el];
       object.set(el, element);
+      checkActiveTab(el);
     }
   }
 }
