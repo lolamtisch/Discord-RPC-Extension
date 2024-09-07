@@ -1,4 +1,4 @@
-const version = "0.1.2";
+const version = "0.3.0";
 const discord = require('./Server/presence');
 const WebSocket = require('ws');
 
