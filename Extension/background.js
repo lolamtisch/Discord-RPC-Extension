@@ -113,21 +113,21 @@ const activeTab = {
 const passiveTab = {
   status: new Map(),
   get(tabId) {
-    return this.status.get(tabId);
+    return this.status.get(String(tabId));
   },
   set(tabId, content) {
     persistTabInfo();
-    return this.status.set(tabId, content);
+    return this.status.set(String(tabId), content);
   },
   has(tabId) {
-    return this.status.has(tabId);
+    return this.status.has(String(tabId));
   },
   values() {
     return this.status.values();
   },
   delete(tabId) {
     persistTabInfo();
-    return this.status.delete(tabId);
+    return this.status.delete(String(tabId));
   },
   size() {
     return this.status.size;
