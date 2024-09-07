@@ -1,9 +1,9 @@
 {
   "name": "discord-rpc",
-  "version": "0.1.2",
+  "version": "0.3.0",
   "description": "",
   "dependencies": {
-    "discord-rich-presence": "0.0.8",
+    "@xhayper/discord-rpc": "^1.2.0",
     "systray": "^1.0.5",
     "ws": "^7.1.1"
   },

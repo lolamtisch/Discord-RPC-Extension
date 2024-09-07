@@ -1,13 +1,11 @@
 // Based on https://github.com/devsnek/discord-rich-presence/blob/master/index.js
 'use strict';
 
-const Discord = require('discord-rpc');
+const Discord = require("@xhayper/discord-rpc");
 const EventEmitter = require('events');
 
-const browser = typeof window !== 'undefined';
-
 function makeClient(clientId) {
-  const rpc = new Discord.Client({ transport: browser ? 'websocket' : 'ipc' });
+  const rpc = new Discord.Client({ clientId });
 
   let connected = false;
   let activityCache = null;
@@ -15,7 +13,7 @@ function makeClient(clientId) {
   const instance = new class RP extends EventEmitter {
     updatePresence(d) {
       if (connected) {
-        rpc.setActivity(d).catch((e) => this.emit('error', e));
+        rpc.user?.setActivity(d).catch((e) => this.emit("error", e));
       } else {
         activityCache = d;
       }
@@ -23,7 +21,7 @@ function makeClient(clientId) {
 
     clearPresence() {
       if (connected) {
-        rpc.clearActivity().catch((e) => this.emit('error', e));
+        rpc.user?.clearActivity().catch((e) => this.emit("error", e));
       } else {
         activityCache = null;
       }
@@ -33,11 +31,11 @@ function makeClient(clientId) {
       const handle = (e) => this.emit('error', e);
       switch (response) {
         case 'YES':
-          rpc.sendJoinInvite(user).catch(handle);
+          rpc.user?.sendJoinInvite(user).catch(handle);
           break;
         case 'NO':
         case 'IGNORE':
-          rpc.closeJoinRequest(user).catch(handle);
+          rpc.user?.closeJoinRequest(user).catch(handle);
           break;
         default:
           console.error('unknown response');
@@ -45,7 +43,7 @@ function makeClient(clientId) {
     }
 
     disconnect() {
-      rpc.destroy().catch((e) => this.emit('error', e));
+      rpc.destroy().catch((e) => this.emit("error", e));
     }
   }();
 
@@ -53,7 +51,7 @@ function makeClient(clientId) {
 
   rpc.on('disconnected', (e) => instance.emit('disconnected', e));
 
-  rpc.login({ clientId })
+  rpc.login()
     .then(() => {
       instance.emit('connected');
       connected = true;
@@ -69,7 +67,9 @@ function makeClient(clientId) {
       });
 
       if (activityCache) {
-        rpc.setActivity(activityCache).catch((e) => instance.emit('error', e));
+        rpc.user
+          ?.setActivity(activityCache)
+          .catch((e) => instance.emit("error", e));
         activityCache = null;
       }
     })
