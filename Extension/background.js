@@ -102,9 +102,11 @@ const activeTab = {
   },
   set(tabId, content) {
     this.status[tabId] = content
+    persistTabInfo();
   },
   delete(tabId) {
     delete this.status[tabId]
+    persistTabInfo();
   }
 };
 
@@ -114,6 +116,7 @@ const passiveTab = {
     return this.status.get(tabId);
   },
   set(tabId, content) {
+    persistTabInfo();
     return this.status.set(tabId, content);
   },
   has(tabId) {
@@ -123,6 +126,7 @@ const passiveTab = {
     return this.status.values();
   },
   delete(tabId) {
+    persistTabInfo();
     return this.status.delete(tabId);
   },
   size() {
@@ -140,11 +144,45 @@ const backgroundTab = {
   },
   set(tabId, content) {
     this.status[tabId] = content;
+    persistTabInfo();
   },
   delete(tabId) {
     delete this.status[tabId];
+    persistTabInfo();
   },
 };
+
+function insertTabInfo(object, data) {
+  for (const el in data) {
+    if (Object.prototype.hasOwnProperty.call(data, el)) {
+      const element = data[el];
+      object.set(el, element);
+    }
+  }
+}
+
+chrome.storage.local.get(["tabInfo"], function (result) {
+  console.log("Tab Info", result.tabInfo);
+  if (result.tabInfo) {
+    insertTabInfo(activeTab, result.tabInfo["activeTab"]);
+    insertTabInfo(passiveTab, result.tabInfo["passiveTab"]);
+    insertTabInfo(backgroundTab, result.tabInfo["backgroundTab"]);
+  }
+});
+
+let debounceTabInfo;
+function persistTabInfo() {
+  clearTimeout(debounceTabInfo);
+  debounceTabInfo = setTimeout(() => {
+    chrome.storage.local.set({
+      tabInfo: {
+        activeTab: activeTab.status,
+        passiveTab: Object.fromEntries(passiveTab.status.entries()),
+        backgroundTab: backgroundTab.status,
+      },
+    });
+  }, 1000);
+}
 
 var activeInterval;
 var focusTimeout;
@@ -166,7 +204,7 @@ function checkActiveTab(tabId){
       requestPresence(...data);
     }, 15000);
     requestPresence(...data);
-  }else if(passiveTab.size() || Object.keys(backgroundTab.values()).length || usingActive.length){
+  }else if(passiveTab.size() || Object.keys(backgroundTab.getAll()).length || usingActive.length){
     if(passiveTab.has(tabId)){
       var temp = passiveTab.get(tabId);
       passiveTab.delete(tabId);
@@ -174,7 +212,7 @@ function checkActiveTab(tabId){
     }
 
     // Combine background, passive tab and using active array as they are handled the same way
-    var pTabs = Object.values(backgroundTab.values()).concat(
+    var pTabs = Object.values(backgroundTab.getAll()).concat(
       Array.from(passiveTab.values()),
       usingActive
     );
