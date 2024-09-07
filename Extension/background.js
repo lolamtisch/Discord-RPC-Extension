@@ -222,6 +222,9 @@ function sanitizePresence(pres) {
   if(typeof pres.presence.smallImageText !== 'undefined' && pres.presence.smallImageText === "") {
     delete pres.presence.smallImageText;
   }
+  if(typeof pres.presence.type !== 'undefined' && ![0, 2, 3, 5].includes(pres.presence.type)) {
+    delete pres.presence.type;
+  }
 
   if (typeof pres.presence.endTimestamp !== 'undefined'){
     pres.presence.endTimestamp = Math.round(pres.presence.endTimestamp);
