@@ -15,9 +15,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build:win && npm run build:linux && npm run build:macos && npm run build:pack",
-    "build:win": "npm run build:win:64 && npm run build:win:32",
+    "build:win": "npm run build:win:64",
     "build:win:64": "pkg -c Server/pkg/win.json --out-path ./dist -t latest-win-x64 Server/win_tray_server.js && create-nodew-exe ./dist/server_win_64bit_debug.exe ./dist/server_win_64bit.exe",
-    "build:win:32": "pkg -o ./dist/server_win_32bit_debug.exe -t latest-win-x86 server.js && create-nodew-exe ./dist/server_win_32bit_debug.exe ./dist/server_win_32bit.exe",
     "build:linux": "npm run build:linux:64 && npm run build:linux:32",
     "build:linux:64": "pkg -c Server/pkg/linux.json --out-path ./dist -t latest-linux-x64 Server/linux_tray_server.js",
     "build:linux:32": "pkg -o ./dist/server_linux_no_tray_debug -t latest-linux-x64 server.js",
