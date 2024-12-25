@@ -1,5 +1,6 @@
 # API
-The api has two parts. The registration and presence listener. They have to be registered inside the content script. Take a look at the example extensions [Here](/Examples).
+#### Please make sure that your `manifest.json` file is in version 2!
+The API has two parts. The registration and presence listener. They have to be registered inside the content script. Take a look at the example extensions [Here](/Examples).
 
 ## Registration
 
@@ -9,6 +10,16 @@ chrome.runtime.sendMessage(extensionId, {mode: 'active'}, function(response) {
 });
 ```
 The registration is only needed to be executed once for the extension to know that the presence exists. The presence is requested every 15 seconds, but if some change happens the presence can be forced to update through calling the registration again.
+
+The extensionId is the ID of the Discord-RPC extension. You will need to check what browser you are in, and change accordingly.
+```JS
+let extensionId = "agnaejlkbiiggajjmnpmeheigkflbnoo"; //Chrome
+if(typeof browser !== 'undefined' && typeof chrome !== "undefined"){
+  extensionId = "{57081fef-67b4-482f-bcb0-69296e63ec4f}"; //Firefox
+}
+```
+This needs to be above the registration code block.
+
 ### Modes
 There are 2 different presence types that can be registered. You have to pass it during the registration.
 #### active
