@@ -23,6 +23,14 @@ archive.finalize();
 archive = archiver('zip', {
   zlib: { level: 9 }
 });
+archive.pipe(fs.createWriteStream(path.join(dist, '/windows_64bit_no_tray.zip')));
+archive.file(path.join(dist, 'server_win_64bit_no_tray.exe'), { name: 'server_win.exe' });
+archive.file(path.join(__dirname, 'startup_windows.bat'), { name: 'startup_windows.bat' });
+archive.finalize();
+
+archive = archiver('zip', {
+  zlib: { level: 9 }
+});
 archive.pipe(fs.createWriteStream(path.join(dist, '/linux.zip')));
 archive.file(path.join(dist, 'server_linux_debug'), { name: 'server_linux_debug' });
 archive.finalize();
